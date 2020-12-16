@@ -22,13 +22,13 @@ export const worker = async (
     const retired = await workerManager.isRetired(address);
 
     if (available) {
-        log.info(`worker [${address}] available`);
+        log.debug(`worker ${address} available for hiring`);
         return false;
     }
 
     if (pending) {
         const user = await workerManager.getUser(address);
-        log.info(`worker [${address}] pending, accepting job from [${user}]`);
+        log.info(`worker ${address} pending, accepting job from [${user}]`);
         const tx = await workerManager.acceptJob();
         log.info(`tx=${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(1);
@@ -38,13 +38,13 @@ export const worker = async (
 
     if (owned) {
         const user = await workerManager.getUser(address);
-        log.info(`worker [${address}] owned by ${user}`);
+        log.info(`worker ${address} owned by ${user}`);
         return false;
     }
 
     if (retired) {
         const user = await workerManager.getUser(address);
-        log.info(`worker [${address}] retired by ${user}`);
+        log.info(`worker ${address} retired by ${user}`);
         // TODO: send money back
         return true;
     }

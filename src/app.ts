@@ -35,7 +35,7 @@ const connect = async (url: string, accountIndex: number) => {
     // get signer
     const signer = provider.getSigner(accountIndex);
     const address = await signer.getAddress();
-    log.info(`starting worker ${address}...`);
+    log.info(`starting worker ${address}`);
 
     // connect to contracts
     const pos = await createPoS(network, signer);

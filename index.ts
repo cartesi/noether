@@ -12,7 +12,9 @@
 
 import { app } from "./src/app";
 import log from "loglevel";
-import yargs, { Argv } from "yargs";
+import chalk from "chalk";
+import prefix from "loglevel-plugin-prefix";
+import yargs, { Argv, boolean } from "yargs";
 
 // parse command line
 let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
@@ -26,13 +28,32 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
             default: 0,
         })
         .option("verbose", {
+            type: "boolean",
             alias: "v",
             default: false,
         });
 }).argv;
 
-// set log level according to verbose option
-log.setLevel(argv.verbose ? "trace" : "info");
+// setup shinny log prefix
+prefix.reg(log);
+interface ColorMapping {
+    [level: string]: chalk.Chalk;
+}
+const colors: ColorMapping = {
+    TRACE: chalk.gray,
+    DEBUG: chalk.gray,
+    INFO: chalk.gray,
+    WARN: chalk.yellow,
+    ERROR: chalk.red,
+};
+prefix.apply(log, {
+    format: (level, _, timestamp) => colors[level](`[${timestamp}] ${level}:`),
+    levelFormatter: (level) => level.toUpperCase(),
+    timestampFormatter: (date) => date.toISOString(),
+});
+
+// set log level according to verbose option, 0 is trace, 2 is info
+log.setLevel(argv.verbose ? 0 : 2);
 
 // run the app
 app(argv.url, argv.accountIndex);
