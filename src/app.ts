@@ -15,7 +15,6 @@ import { produceBlock } from "./block";
 import { worker } from "./worker";
 import { WorkerManager } from "@cartesi/util";
 import { PoS } from "@cartesi/pos";
-import ts from "typescript";
 
 const POLLING_INTERVAL = 5000;
 

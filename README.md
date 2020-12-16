@@ -8,15 +8,19 @@ TODO
 
 ### Requirements
 
-TODO
+- node 12+
 
 ### Build
 
-TODO
+```
+yarn
+```
 
 ## Usage
 
-TODO
+```
+yarn start
+```
 
 ## Contributing
 

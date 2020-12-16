@@ -10,12 +10,19 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-// import commander from "commander";
 import { app } from "./src/app";
+import yargs, { Argv } from "yargs";
 
-/*const program = commander.program;
-program.option("-u, --url", "Node URL", "http://localhost:8545");
-program.parse(process.argv);*/
+let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
+    return yargs
+        .option("url", {
+            describe: "URL of the Ethereum node",
+            default: "http://localhost:8545",
+        })
+        .option("verbose", {
+            alias: "v",
+            default: false,
+        });
+}).argv;
 
-const url = 'http://localhost:8545';
-app(url);
+app(argv.url);
