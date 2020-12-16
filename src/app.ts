@@ -22,7 +22,7 @@ const sleep = (timeout: number) => {
     return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
-const connect = async (url: string) => {
+const connect = async (url: string, accountIndex: number) => {
     console.log(`Connecting to ${url}...`);
     const provider = new ethers.providers.JsonRpcProvider(url);
 
@@ -31,7 +31,7 @@ const connect = async (url: string) => {
     console.log(`Connected to network '${network.name}' (${network.chainId})`);
 
     // get signer
-    const signer = provider.getSigner();
+    const signer = provider.getSigner(accountIndex);
     const address = await signer.getAddress();
     console.log(`Starting worker ${address}...`);
 
@@ -69,9 +69,12 @@ const produce = async (signer: Signer, pos: PoS, user: string) => {
     }
 };
 
-export const app = async (url: string) => {
+export const app = async (url: string, accountIndex: number) => {
     // connect to node
-    const { signer, address, pos, workerManager } = await connect(url);
+    const { signer, address, pos, workerManager } = await connect(
+        url,
+        accountIndex
+    );
 
     // worker hiring
     const { user } = await hire(workerManager, address);

@@ -19,10 +19,14 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
             describe: "URL of the Ethereum node",
             default: "http://localhost:8545",
         })
+        .option("accountIndex", {
+            describe: "Account index from server to use",
+            default: 0,
+        })
         .option("verbose", {
             alias: "v",
             default: false,
         });
 }).argv;
 
-app(argv.url);
+app(argv.url, argv.accountIndex);
