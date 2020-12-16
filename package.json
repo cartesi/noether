@@ -3,6 +3,10 @@
     "noether": "ts-node index.ts"
   },
   "dependencies": {
+    "@cartesi/pos": "^0.1.0-beta.22",
+    "@cartesi/util": "^1.0.0",
+    "commander": "^6.2.1",
+    "ethers": "^5.0.24",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
