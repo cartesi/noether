@@ -9,6 +9,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+import log from "loglevel";
 import { WorkerManager } from "@cartesi/util";
 
 export const worker = async (
@@ -21,31 +22,29 @@ export const worker = async (
     const retired = await workerManager.isRetired(address);
 
     if (available) {
-        console.log(`worker [${address}] available`);
+        log.info(`worker [${address}] available`);
         return false;
     }
 
     if (pending) {
         const user = await workerManager.getUser(address);
-        console.log(
-            `worker [${address}] pending, accepting job from [${user}]`
-        );
+        log.info(`worker [${address}] pending, accepting job from [${user}]`);
         const tx = await workerManager.acceptJob();
-        console.log(`tx=${tx.hash}, waiting for confirmation...`);
+        log.info(`tx=${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(1);
-        console.log(`gas used=${receipt.gasUsed}`);
+        log.info(`gas used=${receipt.gasUsed}`);
         return true;
     }
 
     if (owned) {
         const user = await workerManager.getUser(address);
-        console.log(`worker [${address}] owned by ${user}`);
+        log.info(`worker [${address}] owned by ${user}`);
         return false;
     }
 
     if (retired) {
         const user = await workerManager.getUser(address);
-        console.log(`worker [${address}] retired by ${user}`);
+        log.info(`worker [${address}] retired by ${user}`);
         // TODO: send money back
         return true;
     }

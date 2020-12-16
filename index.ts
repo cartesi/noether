@@ -11,8 +11,10 @@
 // specific language governing permissions and limitations under the License.
 
 import { app } from "./src/app";
+import log from "loglevel";
 import yargs, { Argv } from "yargs";
 
+// parse command line
 let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
     return yargs
         .option("url", {
@@ -29,4 +31,8 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
         });
 }).argv;
 
+// set log level according to verbose option
+log.setLevel(argv.verbose ? "trace" : "info");
+
+// run the app
 app(argv.url, argv.accountIndex);

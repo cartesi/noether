@@ -9,8 +9,10 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+import log from "loglevel";
 import { PoS } from "@cartesi/pos";
 import { Signer } from "ethers";
+
 import { createStaking, createBlockSelector } from "./contracts";
 
 const produceChainBlock = async (
@@ -21,7 +23,7 @@ const produceChainBlock = async (
 ) => {
     // check if chain is active
     if (!(await pos.isActive(chainId))) {
-        console.log(`[chain ${chainId}] inactive`);
+        log.info(`[chain ${chainId}] inactive`);
         return;
     }
 
@@ -33,15 +35,15 @@ const produceChainBlock = async (
         if (maturing.gt(0)) {
             const timestamp = await staking.getMaturingTimestamp(user);
             const date = new Date(timestamp.toNumber() * 1000);
-            console.log(
+            log.info(
                 `[chain ${chainId}] stake of ${maturing} CTSI maturing at ${date} for user ${user}`
             );
         } else {
-            console.log(`[chain ${chainId}] no stake for user ${user}`);
+            log.info(`[chain ${chainId}] no stake for user ${user}`);
         }
         return true;
     }
-    console.log(`[chain ${chainId}] user ${user} stake: ${staked} CTSI`);
+    log.info(`[chain ${chainId}] user ${user} stake: ${staked} CTSI`);
 
     // check if can produce
     const blockSelector = await createBlockSelector(pos, chainId, signer);
@@ -51,15 +53,15 @@ const produceChainBlock = async (
         staked
     );
 
-    console.log(`[chain ${chainId}] canProduce=${canProduce}`);
+    log.info(`[chain ${chainId}] canProduce=${canProduce}`);
     if (canProduce) {
-        console.log(`[chain ${chainId}] trying to produce block...`);
+        log.info(`[chain ${chainId}] trying to produce block...`);
         const tx = await pos.produceBlock(chainId);
-        console.log(
+        log.info(
             `[chain ${chainId}] tx=${tx.hash}, waiting for confirmation...`
         );
         const receipt = await tx.wait(2);
-        console.log(
+        log.info(
             `[chain ${chainId}] block produced, gas used ${receipt.gasUsed}`
         );
     }
@@ -74,7 +76,7 @@ export const produceBlock = async (
     const index = await pos.currentIndex();
 
     if (index.isZero()) {
-        console.log(`No chains`);
+        log.info(`no chains`);
         return true;
     }
 

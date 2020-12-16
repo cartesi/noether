@@ -10,11 +10,13 @@
 // specific language governing permissions and limitations under the License.
 
 import { constants, ethers, Signer } from "ethers";
+import log from "loglevel";
+import { WorkerManager } from "@cartesi/util";
+import { PoS } from "@cartesi/pos";
+
 import { createPoS, createWorkerManager } from "./contracts";
 import { produceBlock } from "./block";
 import { worker } from "./worker";
-import { WorkerManager } from "@cartesi/util";
-import { PoS } from "@cartesi/pos";
 
 const POLLING_INTERVAL = 5000;
 
@@ -23,17 +25,17 @@ const sleep = (timeout: number) => {
 };
 
 const connect = async (url: string, accountIndex: number) => {
-    console.log(`Connecting to ${url}...`);
+    log.info(`connecting to ${url}...`);
     const provider = new ethers.providers.JsonRpcProvider(url);
 
     // get network information
     const network = await provider.getNetwork();
-    console.log(`Connected to network '${network.name}' (${network.chainId})`);
+    log.info(`connected to network '${network.name}' (${network.chainId})`);
 
     // get signer
     const signer = provider.getSigner(accountIndex);
     const address = await signer.getAddress();
-    console.log(`Starting worker ${address}...`);
+    log.info(`starting worker ${address}...`);
 
     // connect to contracts
     const pos = await createPoS(network, signer);
@@ -78,7 +80,7 @@ export const app = async (url: string, accountIndex: number) => {
 
     // worker hiring
     const { user } = await hire(workerManager, address);
-    console.log(`Working on behalf of ${user}`);
+    log.info(`working on behalf of ${user}`);
 
     // loop forever
     await produce(signer, pos, user);

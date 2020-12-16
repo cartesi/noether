@@ -10,6 +10,7 @@
 // specific language governing permissions and limitations under the License.
 
 import { Network } from "@ethersproject/providers";
+import log from "loglevel";
 import {
     BlockSelector,
     BlockSelector__factory,
@@ -72,7 +73,7 @@ const getAddress = (chainId: number, map: ChainMap, name: string): string => {
     }
 
     const address = contract.address;
-    console.log(
+    log.info(
         `${name} resolved to address ${address} at network ${chain.name} (${chainId})`
     );
     return address;
