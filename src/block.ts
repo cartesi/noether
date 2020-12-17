@@ -12,6 +12,7 @@
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
 import { Signer } from "ethers";
+import { formatUnits } from "@ethersproject/units";
 
 import { createStaking, createBlockSelector } from "./contracts";
 
@@ -23,7 +24,7 @@ const produceChainBlock = async (
 ) => {
     // check if chain is active
     if (!(await pos.isActive(chainId))) {
-        log.info(`[chain ${chainId}] inactive`);
+        log.debug(`[chain ${chainId}] inactive`);
         return;
     }
 
@@ -35,15 +36,20 @@ const produceChainBlock = async (
         if (maturing.gt(0)) {
             const timestamp = await staking.getMaturingTimestamp(user);
             const date = new Date(timestamp.toNumber() * 1000);
-            log.info(
-                `[chain ${chainId}] stake of ${maturing} CTSI maturing at ${date} for user ${user}`
+            log.debug(
+                `[chain ${chainId}] stake of ${formatUnits(
+                    maturing,
+                    18
+                )} CTSI maturing at ${date.toISOString()} for user ${user}`
             );
         } else {
-            log.info(`[chain ${chainId}] no stake for user ${user}`);
+            log.debug(`[chain ${chainId}] no stake for user ${user}`);
         }
         return true;
     }
-    log.info(`[chain ${chainId}] user ${user} stake: ${staked} CTSI`);
+    log.debug(
+        `[chain ${chainId}] user ${user} stake: ${formatUnits(staked, 18)} CTSI`
+    );
 
     // check if can produce
     const blockSelector = await createBlockSelector(pos, chainId, signer);
@@ -53,7 +59,7 @@ const produceChainBlock = async (
         staked
     );
 
-    log.info(`[chain ${chainId}] canProduce=${canProduce}`);
+    log.debug(`[chain ${chainId}] canProduce=${canProduce}`);
     if (canProduce) {
         log.info(`[chain ${chainId}] trying to produce block...`);
         const tx = await pos.produceBlock(chainId);
@@ -76,7 +82,7 @@ export const produceBlock = async (
     const index = await pos.currentIndex();
 
     if (index.isZero()) {
-        log.info(`no chains`);
+        log.debug(`no chains`);
         return true;
     }
 

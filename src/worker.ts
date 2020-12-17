@@ -28,7 +28,7 @@ export const worker = async (
 
     if (pending) {
         const user = await workerManager.getUser(address);
-        log.info(`worker ${address} pending, accepting job from [${user}]`);
+        log.info(`accepting job from ${user}...`);
         const tx = await workerManager.acceptJob();
         log.info(`tx=${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(1);

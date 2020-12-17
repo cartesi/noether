@@ -80,7 +80,7 @@ export const app = async (url: string, accountIndex: number) => {
 
     // worker hiring
     const { user } = await hire(workerManager, address);
-    log.info(`working on behalf of ${user}`);
+    log.info(`working for ${user}`);
 
     // loop forever
     await produce(signer, pos, user);
