@@ -8,15 +8,69 @@ TODO
 
 ### Requirements
 
-TODO
+- node 12+
 
 ### Build
 
-TODO
+```
+yarn
+```
 
 ## Usage
 
-TODO
+The first step is to run a hardhat node with all the contracts used by noether deployed.
+Go to the [pos-dlib](http://github.com/cartesi-corp/pos-dlib/) local project clone and run:
+
+```
+npx hardhat node --export ../noether/src/localhost.json
+```
+
+This will run a node, deploy all contracts, and write a json file with the ABIs and contracts address to a file inside the noether src code.
+
+Now run noether. You can see options by running `yarn start --help`:
+
+```
+% yarn start --help
+
+Start the node.
+
+Options:
+      --help          Show help                                        [boolean]
+      --version       Show version number                              [boolean]
+      --url           URL of the Ethereum node[default: "http://localhost:8545"]
+      --accountIndex  Account index from server to use              [default: 0]
+  -v, --verbose                                       [boolean] [default: false]
+```
+
+Try running:
+
+```
+yarn start --account-index 1 --verbose
+```
+
+This will run noether connecting to hardhat node running at http://localhost:8545 and use account index 1 as the worker address.
+We are going to reserve index 0 for the user address.
+
+Now we go back to the `pos` project and run a script to hire the node, by running the following command:
+
+```
+npx hardhat --network localhost worker:hire 1
+```
+
+At this point the node should be hired, and reading chains to produce blocks.
+Next step is to create a chain.
+Run the following script:
+
+```
+npx hardhat --network localhost pos:create
+```
+
+Now stake something:
+
+```
+npx hardhat --network localhost ctsi:allow 100000000000000000000
+npx hardhat --network localhost pos:stake 100000000000000000000
+```
 
 ## Contributing
 
