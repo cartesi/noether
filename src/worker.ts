@@ -12,42 +12,57 @@
 import log from "loglevel";
 import { WorkerManager } from "@cartesi/util";
 
-export const worker = async (
+const POLLING_INTERVAL = 10000;
+const CONFIRMATIONS = 1;
+
+const sleep = (timeout: number) => {
+    return new Promise((resolve) => setTimeout(resolve, timeout));
+};
+
+export const hire = async (
     workerManager: WorkerManager,
     address: string
-): Promise<Boolean> => {
-    const available = await workerManager.isAvailable(address);
-    const pending = await workerManager.isPending(address);
+): Promise<string | undefined> => {
     const owned = await workerManager.isOwned(address);
-    const retired = await workerManager.isRetired(address);
-
-    if (available) {
-        log.debug(`worker ${address} available for hiring`);
-        return false;
+    if (owned) {
+        // already owned, just return the owner
+        return workerManager.getOwner(address);
     }
 
+    const retired = await workerManager.isRetired(address);
+    if (retired) {
+        log.warn(`${address} retired`);
+        // TODO: call retire method
+        process.exit(0);
+    }
+
+    let available = await workerManager.isAvailable(address);
+    if (available) {
+        log.info(`${address} available for hiring`);
+
+        // loop while available
+        do {
+            await sleep(POLLING_INTERVAL);
+            available = await workerManager.isAvailable(address);
+        } while (available);
+    }
+
+    const pending = await workerManager.isPending(address);
     if (pending) {
+        // accept the job from user
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
+
         const tx = await workerManager.acceptJob();
-        log.info(`tx=${tx.hash}, waiting for confirmation...`);
-        const receipt = await tx.wait(1);
-        log.info(`gas used=${receipt.gasUsed}`);
-        return true;
-    }
+        log.info(`transaction ${tx.hash}, waiting for confirmation...`);
+        const receipt = await tx.wait(CONFIRMATIONS);
+        log.debug(`gas used: ${receipt.gasUsed}`);
 
-    if (owned) {
-        const user = await workerManager.getUser(address);
-        log.info(`worker ${address} owned by ${user}`);
-        return false;
+        return workerManager.getOwner(address);
     }
+};
 
-    if (retired) {
-        const user = await workerManager.getUser(address);
-        log.info(`worker ${address} retired by ${user}`);
-        // TODO: send money back
-        return true;
-    }
-
-    return false;
+export const retire = async (workerManager: WorkerManager) => {
+    // TODO:
+    return;
 };
