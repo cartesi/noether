@@ -16,6 +16,8 @@ import {
     BlockSelector__factory,
     PoS,
     PoS__factory,
+    RewardManager,
+    RewardManager__factory,
     Staking,
     StakingImpl__factory,
 } from "@cartesi/pos";
@@ -115,4 +117,13 @@ export const createBlockSelector = async (
 ): Promise<BlockSelector> => {
     const address = await pos.getBlockSelectorAddress(chainId);
     return BlockSelector__factory.connect(address, signer);
+};
+
+export const createRewardManager = async (
+    pos: PoS,
+    chainId: number,
+    signer: Signer
+): Promise<RewardManager> => {
+    const address = await pos.getRewardManagerAddress(chainId);
+    return RewardManager__factory.connect(address, signer);
 };

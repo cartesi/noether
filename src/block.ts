@@ -15,7 +15,13 @@ import { BigNumberish, Signer } from "ethers";
 import humanizeDuration from "humanize-duration";
 import { formatUnits } from "@ethersproject/units";
 
-import { createStaking, createBlockSelector } from "./contracts";
+import {
+    createStaking,
+    createBlockSelector,
+    createRewardManager,
+} from "./contracts";
+
+const CONFIRMATIONS = 1;
 
 const formatCTSI = (value: BigNumberish) => {
     return formatUnits(value, 18);
@@ -79,12 +85,20 @@ const produceChainBlock = async (
 
     log.debug(`[chain ${chainId}] canProduce=${canProduce}`);
     if (canProduce) {
-        log.info(`[chain ${chainId}] trying to produce block...`);
+        const rewardManager = await createRewardManager(pos, chainId, signer);
+        const reward = await rewardManager.getCurrentReward();
+        log.info(
+            `[chain ${chainId}] trying to produce block and claim reward of ${formatCTSI(
+                reward
+            )} CTSI...`
+        );
+
+        // TODO: tweak gas...
         const tx = await pos.produceBlock(chainId);
         log.info(
-            `[chain ${chainId}] tx=${tx.hash}, waiting for confirmation...`
+            `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
         );
-        const receipt = await tx.wait(2);
+        const receipt = await tx.wait(CONFIRMATIONS);
         log.info(
             `[chain ${chainId}] block produced, gas used ${receipt.gasUsed}`
         );
