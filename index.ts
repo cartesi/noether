@@ -14,7 +14,7 @@ import { app } from "./src/app";
 import log from "loglevel";
 import chalk from "chalk";
 import prefix from "loglevel-plugin-prefix";
-import yargs, { Argv, boolean } from "yargs";
+import yargs, { Argv } from "yargs";
 
 // parse command line
 let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {

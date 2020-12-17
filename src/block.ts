@@ -11,10 +11,15 @@
 
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
-import { Signer } from "ethers";
+import { BigNumberish, Signer } from "ethers";
+import humanizeDuration from "humanize-duration";
 import { formatUnits } from "@ethersproject/units";
 
 import { createStaking, createBlockSelector } from "./contracts";
+
+const formatCTSI = (value: BigNumberish) => {
+    return formatUnits(value, 18);
+};
 
 const produceChainBlock = async (
     signer: Signer,
@@ -28,28 +33,41 @@ const produceChainBlock = async (
         return;
     }
 
-    // check stake
+    // check stake state
     const staking = await createStaking(pos, chainId, signer);
     const staked = await staking.getStakedBalance(user);
-    if (staked.isZero()) {
-        const maturing = await staking.getMaturingBalance(user);
-        if (maturing.gt(0)) {
-            const timestamp = await staking.getMaturingTimestamp(user);
-            const date = new Date(timestamp.toNumber() * 1000);
+    const maturing = await staking.getMaturingBalance(user);
+    const timestamp =
+        (await staking.getMaturingTimestamp(user)).toNumber() * 1000;
+    const now = Date.now();
+
+    // print stake
+    if (maturing.gt(0)) {
+        if (timestamp > now) {
             log.debug(
-                `[chain ${chainId}] stake of ${formatUnits(
-                    maturing,
-                    18
-                )} CTSI maturing at ${date.toISOString()} for user ${user}`
+                `[chain ${chainId}] ${formatCTSI(
+                    staked
+                )} CTSI at stake, ${formatCTSI(
+                    maturing
+                )} CTSI maturing in ${humanizeDuration(timestamp - now)}`
             );
         } else {
-            log.debug(`[chain ${chainId}] no stake for user ${user}`);
+            log.warn(
+                `[chain ${chainId}] ${formatCTSI(
+                    staked
+                )} CTSI at stake, ${formatCTSI(
+                    maturing
+                )} CTSI maturing past due ${humanizeDuration(now - timestamp)}`
+            );
         }
+    } else {
+        log.debug(`[chain ${chainId}] ${formatCTSI(staked)} CTSI at stake`);
+    }
+
+    if (staked.isZero()) {
+        // zero mature, bail out
         return true;
     }
-    log.debug(
-        `[chain ${chainId}] user ${user} stake: ${formatUnits(staked, 18)} CTSI`
-    );
 
     // check if can produce
     const blockSelector = await createBlockSelector(pos, chainId, signer);
