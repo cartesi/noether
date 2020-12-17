@@ -9,19 +9,16 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { ethers, Signer } from "ethers";
+import { ethers } from "ethers";
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
 
+import { sleep } from "./util";
 import { createPoS, createWorkerManager } from "./contracts";
 import { produceBlock } from "./block";
 import { hire, retire } from "./worker";
 
-const POLLING_INTERVAL = 10000;
-
-const sleep = (timeout: number) => {
-    return new Promise((resolve) => setTimeout(resolve, timeout));
-};
+const POLLING_INTERVAL = 60000;
 
 const connect = async (url: string, accountIndex: number) => {
     log.info(`connecting to ${url}...`);

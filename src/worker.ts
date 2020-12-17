@@ -11,13 +11,11 @@
 
 import log from "loglevel";
 import { WorkerManager } from "@cartesi/util";
+import { sleep } from "./util";
 
-const POLLING_INTERVAL = 10000;
+const POLLING_INTERVAL = 60000;
 const CONFIRMATIONS = 1;
-
-const sleep = (timeout: number) => {
-    return new Promise((resolve) => setTimeout(resolve, timeout));
-};
+const GAS_MULTIPLIER = 1.2;
 
 export const hire = async (
     workerManager: WorkerManager,
@@ -55,7 +53,10 @@ export const hire = async (
 
         do {
             try {
-                const tx = await workerManager.acceptJob();
+                const gasPrice = await workerManager.signer.getGasPrice();
+                const tx = await workerManager.acceptJob({
+                    gasPrice: gasPrice.mul(GAS_MULTIPLIER),
+                });
                 log.info(`transaction ${tx.hash}, waiting for confirmation...`);
                 const receipt = await tx.wait(CONFIRMATIONS);
                 log.debug(`gas used: ${receipt.gasUsed}`);
@@ -71,5 +72,6 @@ export const hire = async (
 
 export const retire = async (workerManager: WorkerManager) => {
     // TODO:
+    log.warn(`retirement not implemented`);
     return;
 };

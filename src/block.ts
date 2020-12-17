@@ -11,9 +11,8 @@
 
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
-import { BigNumberish } from "ethers";
 import humanizeDuration from "humanize-duration";
-import { formatUnits } from "@ethersproject/units";
+import { formatCTSI } from "./util";
 
 import {
     createStaking,
@@ -22,10 +21,7 @@ import {
 } from "./contracts";
 
 const CONFIRMATIONS = 1;
-
-const formatCTSI = (value: BigNumberish) => {
-    return formatUnits(value, 18);
-};
+const GAS_MULTIPLIER = 1.2;
 
 const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
@@ -94,21 +90,26 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
 
     log.debug(`[chain ${chainId}] canProduce=${canProduce}`);
     if (canProduce) {
-        log.info(
-            `[chain ${chainId}] trying to produce block and claim reward of ${formatCTSI(
-                reward
-            )} CTSI...`
-        );
-
-        // TODO: tweak gas...
-        const tx = await pos.produceBlock(chainId);
-        log.info(
-            `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
-        );
-        const receipt = await tx.wait(CONFIRMATIONS);
-        log.info(
-            `[chain ${chainId}] block produced, gas used ${receipt.gasUsed}`
-        );
+        try {
+            log.info(
+                `[chain ${chainId}] trying to produce block and claim reward of ${formatCTSI(
+                    reward
+                )} CTSI...`
+            );
+            const gasPrice = await pos.signer.getGasPrice();
+            const tx = await pos.produceBlock(chainId, {
+                gasPrice: gasPrice,
+            });
+            log.info(
+                `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+            );
+            const receipt = await tx.wait(CONFIRMATIONS);
+            log.info(
+                `[chain ${chainId}] block produced, gas used ${receipt.gasUsed}`
+            );
+        } catch (e) {
+            log.error(e.message);
+        }
     }
 };
 
@@ -126,7 +127,7 @@ export const produceBlock = async (
 
     // loop through all chains
     for (let chainId = 0; chainId < index.toNumber(); chainId++) {
-        produceChainBlock(pos, user, chainId);
+        await produceChainBlock(pos, user, chainId);
     }
     return true;
 };
