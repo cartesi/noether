@@ -50,8 +50,8 @@ const connect = async (url: string, accountIndex: number) => {
     };
 };
 
-const produce = async (signer: Signer, pos: PoS, user: string) => {
-    while (await produceBlock(signer, pos, user)) {
+const produce = async (pos: PoS, user: string) => {
+    while (await produceBlock(pos, user)) {
         await sleep(POLLING_INTERVAL);
     }
 };
@@ -72,5 +72,5 @@ export const app = async (url: string, accountIndex: number) => {
     log.info(`worker hired by ${user}`);
 
     // loop forever
-    await produce(signer, pos, user);
+    await produce(pos, user);
 };
