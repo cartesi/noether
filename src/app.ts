@@ -18,7 +18,7 @@ import { createPoS, createWorkerManager } from "./contracts";
 import { produceBlock } from "./block";
 import { worker } from "./worker";
 
-const POLLING_INTERVAL = 5000;
+const POLLING_INTERVAL = 10000;
 
 const sleep = (timeout: number) => {
     return new Promise((resolve) => setTimeout(resolve, timeout));
