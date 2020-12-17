@@ -75,9 +75,7 @@ const getAddress = (chainId: number, map: ChainMap, name: string): string => {
     }
 
     const address = contract.address;
-    log.debug(
-        `${name} resolved to address ${address} at network ${chain.name} (${chainId})`
-    );
+    log.debug(`${name}(${address})`);
     return address;
 };
 

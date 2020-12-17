@@ -47,18 +47,25 @@ export const hire = async (
         } while (available);
     }
 
-    const pending = await workerManager.isPending(address);
+    let pending = await workerManager.isPending(address);
     if (pending) {
         // accept the job from user
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
 
-        const tx = await workerManager.acceptJob();
-        log.info(`transaction ${tx.hash}, waiting for confirmation...`);
-        const receipt = await tx.wait(CONFIRMATIONS);
-        log.debug(`gas used: ${receipt.gasUsed}`);
-
-        return workerManager.getOwner(address);
+        do {
+            try {
+                const tx = await workerManager.acceptJob();
+                log.info(`transaction ${tx.hash}, waiting for confirmation...`);
+                const receipt = await tx.wait(CONFIRMATIONS);
+                log.debug(`gas used: ${receipt.gasUsed}`);
+                return workerManager.getOwner(address);
+            } catch (e) {
+                log.error(e.message);
+                await sleep(POLLING_INTERVAL);
+                pending = await workerManager.isPending(address);
+            }
+        } while (pending);
     }
 };
 
