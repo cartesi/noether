@@ -65,6 +65,12 @@ Run the following script:
 npx hardhat --network localhost pos:create
 ```
 
+Next step is to fund the RewardManager, by running the following command, replacing `<RewardManagerAddress>` by the address printed in the previous step.
+
+```
+npx hardhat --network localhost ctsi:transfer <RewardManagerAddress> 10000000000000000000000
+```
+
 Now stake something:
 
 ```

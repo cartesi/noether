@@ -11,7 +11,7 @@
 
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
-import { BigNumberish, Signer } from "ethers";
+import { BigNumberish } from "ethers";
 import humanizeDuration from "humanize-duration";
 import { formatUnits } from "@ethersproject/units";
 
@@ -27,20 +27,25 @@ const formatCTSI = (value: BigNumberish) => {
     return formatUnits(value, 18);
 };
 
-const produceChainBlock = async (
-    signer: Signer,
-    pos: PoS,
-    user: string,
-    chainId: number
-) => {
+const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
-    if (!(await pos.isActive(chainId))) {
+    const active = await pos.isActive(chainId);
+    if (!active) {
         log.debug(`[chain ${chainId}] inactive`);
         return;
     }
 
+    const rewardManager = await createRewardManager(pos, chainId, pos.signer);
+    const reward = await rewardManager.getCurrentReward();
+    if (reward.isZero()) {
+        log.debug(
+            `[chain ${chainId}] zero reward from RewardManager(${rewardManager.address})`
+        );
+        return;
+    }
+
     // check stake state
-    const staking = await createStaking(pos, chainId, signer);
+    const staking = await createStaking(pos, chainId, pos.signer);
     const staked = await staking.getStakedBalance(user);
     const maturing = await staking.getMaturingBalance(user);
     const timestamp =
@@ -55,7 +60,9 @@ const produceChainBlock = async (
                     staked
                 )} CTSI at stake, ${formatCTSI(
                     maturing
-                )} CTSI maturing in ${humanizeDuration(timestamp - now)}`
+                )} CTSI maturing in ${humanizeDuration(timestamp - now, {
+                    maxDecimalPoints: 0,
+                })}`
             );
         } else {
             log.warn(
@@ -63,7 +70,9 @@ const produceChainBlock = async (
                     staked
                 )} CTSI at stake, ${formatCTSI(
                     maturing
-                )} CTSI maturing past due ${humanizeDuration(now - timestamp)}`
+                )} CTSI maturing past due ${humanizeDuration(now - timestamp, {
+                    maxDecimalPoints: 0,
+                })}`
             );
         }
     } else {
@@ -72,11 +81,11 @@ const produceChainBlock = async (
 
     if (staked.isZero()) {
         // zero mature, bail out
-        return true;
+        return;
     }
 
     // check if can produce
-    const blockSelector = await createBlockSelector(pos, chainId, signer);
+    const blockSelector = await createBlockSelector(pos, chainId, pos.signer);
     const canProduce = await blockSelector.canProduceBlock(
         await pos.getBlockSelectorIndex(chainId),
         user,
@@ -85,8 +94,6 @@ const produceChainBlock = async (
 
     log.debug(`[chain ${chainId}] canProduce=${canProduce}`);
     if (canProduce) {
-        const rewardManager = await createRewardManager(pos, chainId, signer);
-        const reward = await rewardManager.getCurrentReward();
         log.info(
             `[chain ${chainId}] trying to produce block and claim reward of ${formatCTSI(
                 reward
@@ -106,7 +113,6 @@ const produceChainBlock = async (
 };
 
 export const produceBlock = async (
-    signer: Signer,
     pos: PoS,
     user: string
 ): Promise<Boolean> => {
@@ -120,7 +126,7 @@ export const produceBlock = async (
 
     // loop through all chains
     for (let chainId = 0; chainId < index.toNumber(); chainId++) {
-        produceChainBlock(signer, pos, user, chainId);
+        produceChainBlock(pos, user, chainId);
     }
     return true;
 };
