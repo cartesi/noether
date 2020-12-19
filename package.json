@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "ts-node index.ts start"
+    "build": "tsc",
+    "start": "ts-node src/index.ts start"
   },
   "dependencies": {
     "@cartesi/pos": "^0.1.0-beta.22",

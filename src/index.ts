@@ -10,7 +10,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { app } from "./src/app";
+import { app } from "./app";
 import log from "loglevel";
 import chalk from "chalk";
 import prefix from "loglevel-plugin-prefix";
@@ -54,6 +54,22 @@ prefix.apply(log, {
 
 // set log level according to verbose option, 0 is trace, 2 is info
 log.setLevel(argv.verbose ? 0 : 2);
+
+// The signals we want to handle
+// NOTE: although it is tempting, the SIGKILL signal (9) cannot be intercepted and handled
+const signals = {
+    SIGHUP: 1,
+    SIGINT: 2,
+    SIGTERM: 15,
+};
+
+// Create a listener for each of the signals that we want to handle
+Object.keys(signals).forEach((signal) => {
+    process.on(signal, () => {
+        log.info(`shutdown, process receive a ${signal} signal`);
+        process.exit(128);
+    });
+});
 
 // run the app
 app(argv.url, argv.accountIndex);

@@ -1,0 +1,14 @@
+version: '3'
+services:
+  signer:
+    image: cartesi/ethsigner:0.1.1
+    command: "--chain-id=1 --downstream-http-host=eth.cartesi.io --downstream-http-port=443 --http-cors-origins=\"http://localhost:3000,https://explorer.cartesi.io\" --downstream-http-tls-enabled"
+    volumes:
+      - wallet:/root/.ethereum
+
+  dispatcher:
+    image: cartesi/noether:latest
+    command: "--url http://signer:8545"
+
+volumes:
+  wallet:
