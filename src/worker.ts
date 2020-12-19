@@ -10,14 +10,17 @@
 // specific language governing permissions and limitations under the License.
 
 import log from "loglevel";
+import { retryDecorator } from "ts-retry-promise";
 import { WorkerManager } from "@cartesi/util";
 import { sleep } from "./util";
+import {
+    CONFIRMATIONS,
+    POLLING_INTERVAL,
+    RETRY_INTERVAL,
+    TIMEOUT,
+} from "./config";
 
-const POLLING_INTERVAL = 60000;
-const CONFIRMATIONS = 1;
-const GAS_MULTIPLIER = 1.2;
-
-export const hire = async (
+const _hire = async (
     workerManager: WorkerManager,
     address: string
 ): Promise<string | undefined> => {
@@ -51,23 +54,13 @@ export const hire = async (
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
 
-        do {
-            try {
-                const gasPrice = await workerManager.signer.getGasPrice();
-                const tx = await workerManager.acceptJob({
-                    gasPrice: gasPrice.mul(GAS_MULTIPLIER),
-                });
-                log.info(`transaction ${tx.hash}, waiting for confirmation...`);
-                const receipt = await tx.wait(CONFIRMATIONS);
-                log.debug(`gas used: ${receipt.gasUsed}`);
-                return workerManager.getOwner(address);
-            } catch (e) {
-                log.error(e.message);
-                await sleep(POLLING_INTERVAL);
-                pending = await workerManager.isPending(address);
-            }
-        } while (pending);
+        const tx = await workerManager.acceptJob();
+        log.info(`transaction ${tx.hash}, waiting for confirmation...`);
+        const receipt = await tx.wait(CONFIRMATIONS);
+        log.debug(`gas used: ${receipt.gasUsed}`);
+        return workerManager.getOwner(address);
     }
+    return undefined;
 };
 
 export const retire = async (workerManager: WorkerManager) => {
@@ -75,3 +68,10 @@ export const retire = async (workerManager: WorkerManager) => {
     log.warn(`retirement not implemented`);
     return;
 };
+
+export const hire = retryDecorator(_hire, {
+    logger: log.warn,
+    delay: RETRY_INTERVAL,
+    retries: "INFINITELY",
+    timeout: TIMEOUT,
+});

@@ -9,43 +9,14 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { ethers } from "ethers";
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
 
 import { sleep } from "./util";
-import { createPoS, createWorkerManager } from "./contracts";
+import { connect } from "./connection";
 import { produceBlock } from "./block";
 import { hire, retire } from "./worker";
-
-const POLLING_INTERVAL = 60000;
-
-const connect = async (url: string, accountIndex: number) => {
-    log.info(`connecting to ${url}...`);
-    const provider = new ethers.providers.JsonRpcProvider(url);
-
-    // get network information
-    const network = await provider.getNetwork();
-    log.info(`connected to network '${network.name}' (${network.chainId})`);
-
-    // get signer
-    const signer = provider.getSigner(accountIndex);
-    const address = await signer.getAddress();
-    log.info(`starting worker ${address}`);
-
-    // connect to contracts
-    const pos = await createPoS(network, signer);
-    const workerManager = await createWorkerManager(network, signer);
-
-    return {
-        provider,
-        network,
-        signer,
-        address,
-        pos,
-        workerManager,
-    };
-};
+import { POLLING_INTERVAL } from "./config";
 
 const produce = async (pos: PoS, user: string) => {
     while (await produceBlock(pos, user)) {
@@ -55,13 +26,11 @@ const produce = async (pos: PoS, user: string) => {
 
 export const app = async (url: string, accountIndex: number) => {
     // connect to node
-    const { signer, address, pos, workerManager } = await connect(
-        url,
-        accountIndex
-    );
+    const { address, pos, workerManager } = await connect(url, accountIndex);
 
     // worker hiring
     const user = await hire(workerManager, address);
+
     if (!user) {
         log.error(`failed to hire`);
         return;

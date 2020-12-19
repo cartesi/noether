@@ -20,8 +20,7 @@ import {
     createRewardManager,
 } from "./contracts";
 
-const CONFIRMATIONS = 1;
-const GAS_MULTIPLIER = 1.2;
+import { CONFIRMATIONS, GAS_MULTIPLIER } from "./config";
 
 const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
@@ -117,17 +116,21 @@ export const produceBlock = async (
     pos: PoS,
     user: string
 ): Promise<Boolean> => {
-    // number of chains
-    const index = await pos.currentIndex();
+    try {
+        // number of chains
+        const index = await pos.currentIndex();
 
-    if (index.isZero()) {
-        log.debug(`no chains`);
-        return true;
-    }
+        if (index.isZero()) {
+            log.debug(`no chains`);
+            return true;
+        }
 
-    // loop through all chains
-    for (let chainId = 0; chainId < index.toNumber(); chainId++) {
-        await produceChainBlock(pos, user, chainId);
+        // loop through all chains
+        for (let chainId = 0; chainId < index.toNumber(); chainId++) {
+            await produceChainBlock(pos, user, chainId);
+        }
+    } catch (e) {
+        log.error(e.message);
     }
     return true;
 };
