@@ -15,6 +15,7 @@ import { WorkerManager } from "@cartesi/util";
 import { sleep } from "./util";
 import {
     CONFIRMATIONS,
+    GAS_MULTIPLIER,
     POLLING_INTERVAL,
     RETRY_INTERVAL,
     TIMEOUT,
@@ -54,7 +55,18 @@ const _hire = async (
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
 
-        const tx = await workerManager.acceptJob();
+        // get gas price from provider
+        const currentGasPrice = await workerManager.provider.getGasPrice();
+
+        // increase the price
+        const gasPrice = currentGasPrice.mul(16).div(10);
+        log.debug(
+            `gasPrice: ${gasPrice} = ${currentGasPrice} * ${GAS_MULTIPLIER} / 100`
+        );
+
+        const tx = await workerManager.acceptJob({
+            gasPrice: gasPrice,
+        });
         log.info(`transaction ${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(CONFIRMATIONS);
         log.debug(`gas used: ${receipt.gasUsed}`);
