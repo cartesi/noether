@@ -6,7 +6,7 @@ services:
     volumes:
       - wallet:/root/.ethereum
 
-  dispatcher:
+  noether:
     image: cartesi/noether:latest
     command: "--url http://signer:8545 --verbose"
 
