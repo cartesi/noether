@@ -12,45 +12,28 @@ Instruction for each environment in the following sections.
 
 ## Mainnet public network
 
-To run the Noether node on main just execute the command below:
+To run the Noether node on mainnet just execute the command below:
 
 ```
-docker-compose -p cartesi up
+docker run -it --rm --name cartesi_noether -v cartesi_wallet:/root/.ethereum cartesi/noether:wallet --url https://eth.cartesi.io --wallet /root/.ethereum/key --create --verbose
 ```
 
-This will launch two docker containers: `cartesi_signer` and `cartesi_noether`, and also create a local docker volume called `cartesi_wallet`.
+This will launch a docker container named `cartesi_noether`, and also create a local docker volume called `cartesi_wallet`.
 
-The `signer` container is a ETH proxy responsible for signing ETH transactions and fowarding raw transactions to an light ethereum node. The ethereum node can be any node, either provided privately by the user (like a `geth`), or a service provided by a third-party, like [Infura](https://infura.io), [Cloudflare Ethereum Gateway](https://developers.cloudflare.com/distributed-web/ethereum-gateway), or [Alchemy](https://alchemyapi.io). The default configuration uses Cloudflare, so you don't need any additional step. Configuring the system to use another ethereum node is currently out of scope of this documentation.
+The container connects to an ethereum node, which in the command above is [Cloudflare Ethereum Gateway](https://developers.cloudflare.com/distributed-web/ethereum-gateway). Any ethereum node can be used by replacing that by a local `geth` or another service provided by a third-party, like [Infura](https://infura.io) or [Alchemy](https://alchemyapi.io).
 
-The `signer`, when executed for the first time, creates a new ethereum wallet, which is stored in the `wallet` docker volume. This wallet starts with zero ETH balance, and must be funded by the user in a process we call "hiring the node", which means making the node starts working on your behalf. You can stop and restart your node anytime, as long as you don't delete your `wallet` docker volume. If you do, you lose its private key, and the funds in it.
+The noether container, when executed for the first time, creates a new ethereum wallet, which is stored in an encrypted file inside the `cartesi_wallet` docker volume. A password is asked when wallet is created and whenever you need to decrypt it. This wallet starts with zero ETH balance, and must be funded by the user in a process we call "hiring the node", which means making the node starts working on your behalf. You can stop and restart your node anytime, as long as you don't delete your `wallet` docker volume. If you do, you lose its private key, and the funds in it.
 
 The `noether` implements the logic of the Cartesi Proof of Stake network, which as of now just produces empty blocks paying CTSI rewards for the producers. It keeps polling the blocking until it gets selected to produce a block. For further information check the [pos-dlib repository](https://github.com/cartesi/pos-dlib) documentation.
 
 After you run the node the first step you should see something like the log below:
 
 ```
-signer_1   |          .
-signer_1   |         / \
-signer_1   |       /    \
-signer_1   | \---/---\  /----\
-signer_1   |  \       X       \
-signer_1   |   \----/  \---/---\
-signer_1   |        \    / CARTESI
-signer_1   |         \ /
-signer_1   |          '
-signer_1   |
-signer_1   | Creating new wallet...
-signer_1   | Address: 0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9
-signer_1   | Setting logging level to INFO
-signer_1   | 2020-12-19 22:51:50.790+00:00 | main | INFO  | SignerSubCommand | Version = ethsigner/v20.10.0/linux-x86_64/oracle_openjdk-java-16
-signer_1   | 2020-12-19 22:51:52.292+00:00 | main | INFO  | Runner | Server is up, and listening on 8545
-noether_1  | [2020-12-19T22:51:56.726Z] INFO: connecting to http://signer:8545...
-noether_1  | [2020-12-19T22:51:57.585Z] INFO: connected to network 'homestead' (1)
-noether_1  | [2020-12-19T22:51:57.629Z] INFO: starting worker 0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9
-noether_1  | [2020-12-19T22:51:57.630Z] DEBUG: PoS(0x8Bd18D3A2B49Db3234a648fC0F7CeDdE2359c2A6)
-noether_1  | [2020-12-19T22:51:57.637Z] DEBUG: WorkerManagerAuthManagerImpl(0x832D9f06970ddAc7BA49Be5a2cCad8f89Df74C13)
-noether_1  | [2020-12-19T22:51:59.623Z] INFO: 0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9 available for hiring
-noether_1  | [2020-12-19T22:51:59.624Z] DEBUG: sleeping for 1 minute
+[2020-12-22T05:58:58.185Z] INFO: connecting to https://eth.cartesi.io...
+[2020-12-22T05:58:58.412Z] INFO: connected to network 'homestead' (1)
+[2020-12-22T05:58:58.413Z] INFO: loading wallet from /root/.ethereum/key
+✔ new password … ***************
+[2020-12-22T05:59:05.341Z] INFO: starting worker 0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9
 ```
 
 The first step you need to do now is to hire your new node, which will make it work on your behalf.
@@ -66,10 +49,10 @@ Running on [goerli](https://goerli.net) is very similar to running on `mainnet`,
 1) The command is:
 
 ```
-docker-compose -p cartesi_goerli -f docker-compose-goerli.yml up
+docker run -it --rm --name cartesi_goerli_noether -v cartesi_goerli_wallet:/root/.ethereum cartesi/noether:wallet --url https://goerli.infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
 ```
 
-2) Cloudflare Ethereum gateway does not provide a goerli option, so we use [Infura](https://infura.io). You need to setup an Infura account, and create an environment variable called `PROJECT_ID` with the id of your Infura project.
+2) Cloudflare Ethereum gateway does not provide a goerli option, so we use [Infura](https://infura.io). You need to setup an Infura account, create an application and use the application URL in the command above.
 
 3) You don't spend real money
 
@@ -97,7 +80,10 @@ Options:
       --help          Show help                                        [boolean]
       --version       Show version number                              [boolean]
       --url           URL of the Ethereum node[default: "http://localhost:8545"]
+      --wallet        Filename of JSON wallet file                      [string]
       --accountIndex  Account index from server to use              [default: 0]
+  -c, --create        Create a wallet if it doesn't exist
+                                                      [boolean] [default: false]
   -v, --verbose                                       [boolean] [default: false]
 ```
 

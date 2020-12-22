@@ -24,7 +24,7 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
             default: "http://localhost:8545",
         })
         .option("wallet", {
-            describe: "File path of JSON wallet file",
+            describe: "Filename of JSON wallet file",
             type: "string",
         })
         .option("accountIndex", {
@@ -32,6 +32,7 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
             default: 0,
         })
         .option("create", {
+            describe: "Create a wallet if it doesn't exist",
             type: "boolean",
             alias: "c",
             default: false,
