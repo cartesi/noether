@@ -24,9 +24,21 @@ const produce = async (pos: PoS, user: string) => {
     }
 };
 
-export const app = async (url: string, accountIndex: number) => {
+export const app = async (
+    url: string,
+    accountIndex: number,
+    wallet: string | undefined,
+    create: boolean,
+    password: string
+) => {
     // connect to node
-    const { address, pos, workerManager } = await connect(url, accountIndex);
+    const { address, pos, workerManager } = await connect(
+        url,
+        accountIndex,
+        wallet,
+        create,
+        password
+    );
 
     // worker hiring
     const user = await hire(workerManager, address);

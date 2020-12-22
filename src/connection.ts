@@ -9,13 +9,50 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { ethers } from "ethers";
+import fs from "fs";
+import { ethers, Wallet } from "ethers";
 import log from "loglevel";
 import { retryDecorator } from "ts-retry-promise";
 import { RETRY_INTERVAL, TIMEOUT } from "./config";
 import { createPoS, createWorkerManager } from "./contracts";
 
-const _connect = async (url: string, accountIndex: number) => {
+const loadWallet = async (
+    filename: string,
+    create: boolean,
+    password: string
+): Promise<Wallet> => {
+    log.info(`loading wallet from ${filename}`);
+    if (!fs.existsSync(filename)) {
+        if (!create) {
+            // did not ask to create wallet if non-existant, raise an error
+            throw new Error(`wallet ${filename} not found`);
+        }
+
+        // create new wallet
+        log.info(`wallet does not exist, creating a new one`);
+        const wallet = Wallet.createRandom();
+
+        // create encrypted structured
+        const json = await wallet.encrypt(password);
+
+        // save key V3
+        fs.writeFileSync(filename, json);
+
+        return wallet;
+    } else {
+        // load wallet from file
+        const json = fs.readFileSync(filename, "utf-8");
+        return Wallet.fromEncryptedJson(json, password);
+    }
+};
+
+const _connect = async (
+    url: string,
+    accountIndex: number,
+    wallet: string | undefined,
+    create: boolean,
+    password: string
+) => {
     log.info(`connecting to ${url}...`);
     const provider = new ethers.providers.JsonRpcProvider(url);
 
@@ -23,8 +60,11 @@ const _connect = async (url: string, accountIndex: number) => {
     const network = await provider.getNetwork();
     log.info(`connected to network '${network.name}' (${network.chainId})`);
 
-    // get signer
-    const signer = provider.getSigner(accountIndex);
+    // create signer either from wallet or use provider as signer
+    const signer = wallet
+        ? (await loadWallet(wallet, create, password)).connect(provider)
+        : provider.getSigner(accountIndex);
+
     const address = await signer.getAddress();
     log.info(`starting worker ${address}`);
 

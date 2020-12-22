@@ -23,9 +23,18 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
             describe: "URL of the Ethereum node",
             default: "http://localhost:8545",
         })
+        .option("wallet", {
+            describe: "File path of JSON wallet file",
+            type: "string",
+        })
         .option("accountIndex", {
             describe: "Account index from server to use",
             default: 0,
+        })
+        .option("create", {
+            type: "boolean",
+            alias: "c",
+            default: false,
         })
         .option("verbose", {
             type: "boolean",
@@ -72,4 +81,4 @@ Object.keys(signals).forEach((signal) => {
 });
 
 // run the app
-app(argv.url, argv.accountIndex);
+app(argv.url, argv.accountIndex, argv.wallet, argv.create, "test");
