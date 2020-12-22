@@ -12,20 +12,22 @@
 import fs from "fs";
 import { ethers, Wallet } from "ethers";
 import log from "loglevel";
-import { retryDecorator } from "ts-retry-promise";
+import { retryDecorator, NotRetryableError } from "ts-retry-promise";
+import readlineSync from "readline-sync";
 import { RETRY_INTERVAL, TIMEOUT } from "./config";
 import { createPoS, createWorkerManager } from "./contracts";
 
 const loadWallet = async (
     filename: string,
-    create: boolean,
-    password: string
+    create: boolean
 ): Promise<Wallet> => {
     log.info(`loading wallet from ${filename}`);
+
     if (!fs.existsSync(filename)) {
         if (!create) {
             // did not ask to create wallet if non-existant, raise an error
-            throw new Error(`wallet ${filename} not found`);
+            log.error(`file ${filename} not found`);
+            throw new NotRetryableError(`wallet ${filename} not found`);
         }
 
         // create new wallet
@@ -33,6 +35,14 @@ const loadWallet = async (
         const wallet = Wallet.createRandom();
 
         // create encrypted structured
+        const password = readlineSync.questionNewPassword(
+            "input new password: ",
+            {
+                cancel: true,
+                caseSensitive: true,
+                min: 8,
+            }
+        );
         const json = await wallet.encrypt(password);
 
         // save key V3
@@ -42,6 +52,16 @@ const loadWallet = async (
     } else {
         // load wallet from file
         const json = fs.readFileSync(filename, "utf-8");
+
+        // read password from stdin
+        const password = readlineSync.question("password: ", {
+            cancel: true,
+            hideEchoBack: true,
+            mask: "*",
+            caseSensitive: true,
+        });
+
+        // load wallet
         return Wallet.fromEncryptedJson(json, password);
     }
 };
@@ -50,8 +70,7 @@ const _connect = async (
     url: string,
     accountIndex: number,
     wallet: string | undefined,
-    create: boolean,
-    password: string
+    create: boolean
 ) => {
     log.info(`connecting to ${url}...`);
     const provider = new ethers.providers.JsonRpcProvider(url);
@@ -62,7 +81,7 @@ const _connect = async (
 
     // create signer either from wallet or use provider as signer
     const signer = wallet
-        ? (await loadWallet(wallet, create, password)).connect(provider)
+        ? (await loadWallet(wallet, create)).connect(provider)
         : provider.getSigner(accountIndex);
 
     const address = await signer.getAddress();
@@ -83,8 +102,8 @@ const _connect = async (
 };
 
 export const connect = retryDecorator(_connect, {
+    logger: log.warn,
     delay: RETRY_INTERVAL,
     retries: "INFINITELY",
-    logger: log.warn,
     timeout: TIMEOUT,
 });

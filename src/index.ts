@@ -81,4 +81,4 @@ Object.keys(signals).forEach((signal) => {
 });
 
 // run the app
-app(argv.url, argv.accountIndex, argv.wallet, argv.create, "test");
+app(argv.url, argv.accountIndex, argv.wallet, argv.create);
