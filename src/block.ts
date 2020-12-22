@@ -12,6 +12,7 @@
 import log from "loglevel";
 import { PoS } from "@cartesi/pos";
 import humanizeDuration from "humanize-duration";
+import pTimeout from "p-timeout";
 import { formatCTSI } from "./util";
 
 import {
@@ -20,7 +21,7 @@ import {
     createRewardManager,
 } from "./contracts";
 
-import { CONFIRMATIONS, GAS_MULTIPLIER } from "./config";
+import { CONFIRMATIONS, CONFIRMATION_TIMEOUT, GAS_MULTIPLIER } from "./config";
 
 const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
@@ -102,7 +103,16 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
             log.info(
                 `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
             );
-            const receipt = await tx.wait(CONFIRMATIONS);
+
+            // wait for confirmation, with a timeout
+            const receipt = await pTimeout(
+                tx.wait(CONFIRMATIONS),
+                CONFIRMATION_TIMEOUT,
+                `timeout waiting ${humanizeDuration(
+                    CONFIRMATION_TIMEOUT
+                )} for confirmation`
+            );
+
             log.info(
                 `[chain ${chainId}] block produced, gas used ${receipt.gasUsed}`
             );
@@ -125,7 +135,7 @@ export const produceBlock = async (
             return true;
         }
 
-        // loop through all chains
+        // loop through all chains, each at a time
         for (let chainId = 0; chainId < index.toNumber(); chainId++) {
             await produceChainBlock(pos, user, chainId);
         }

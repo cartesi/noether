@@ -638,6 +638,11 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
   integrity sha1-9sAMHAsIIkblxNmd+4x8CDsrWCo=
 
+p-timeout@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/p-timeout/-/p-timeout-4.0.1.tgz#a4c1d33f50fcae3a302e9a37c980ad360f3163ab"
+  integrity sha512-7GfpWa9RVtx27xhLJiICP4qwAk4MlY1/Q7AEfE1jWzoWQtowKzpm5Roo6ConYGxatwm7hJmT6EmInipN5RpG5Q==
+
 prettier@2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.2.1.tgz#795a1a78dd52f073da0cd42b21f9c91381923ff5"
