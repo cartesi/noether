@@ -20,11 +20,13 @@ docker run -it --rm --name cartesi_noether -v cartesi_wallet:/root/.ethereum car
 
 This will launch a docker container named `cartesi_noether`, and also create a local docker volume called `cartesi_wallet`.
 
-The container connects to an ethereum node, which in the command above is [Cloudflare Ethereum Gateway](https://developers.cloudflare.com/distributed-web/ethereum-gateway). Any ethereum node can be used by replacing that by a local `geth` or another service provided by a third-party, like [Infura](https://infura.io) or [Alchemy](https://alchemyapi.io).
+The container connects to an ethereum node specified with the `--url` parameter, which in the command above is `eth.cartesi.io`, a CNAME for [Cloudflare Ethereum Gateway](https://developers.cloudflare.com/distributed-web/ethereum-gateway). Any ethereum node can be used by replacing that by a local `geth` URL or another service provided by a third-party, like [Infura](https://infura.io) or [Alchemy](https://alchemyapi.io).
 
-The noether container, when executed for the first time, creates a new ethereum wallet, which is stored in an encrypted file inside the `cartesi_wallet` docker volume. A password is asked when wallet is created and whenever you need to decrypt it. This wallet starts with zero ETH balance, and must be funded by the user in a process we call "hiring the node", which means making the node starts working on your behalf. You can stop and restart your node anytime, as long as you don't delete your `wallet` docker volume. If you do, you lose its private key, and the funds in it.
+The noether container, when executed for the first time, creates a new ethereum wallet, which is stored in an encrypted file inside the `cartesi_wallet` docker volume. A password is asked when the wallet is created and whenever you need to decrypt it. Keep this password safe, otherwise you lose or compromise access to your node's wallet.
 
-The `noether` implements the logic of the Cartesi Proof of Stake network, which as of now just produces empty blocks paying CTSI rewards for the producers. It keeps polling the blocking until it gets selected to produce a block. For further information check the [pos-dlib repository](https://github.com/cartesi/pos-dlib) documentation.
+The node wallet starts with zero ETH balance, and must be funded by the user in a process we call "hiring the node", which means making the node starts working on your behalf. The node signs and sends transaction without prompting you, the user, so don't overfund it. You can stop and restart your node anytime, as long as you don't delete your `wallet` docker volume.
+
+Noether implements the logic of the Cartesi Proof of Stake network, which as of now just produces empty blocks paying CTSI rewards for the producers. It keeps polling the PoS contract until it gets selected to produce a block. For further information check the [pos-dlib repository](https://github.com/cartesi/pos-dlib) documentation.
 
 After you run the node the first step you should see something like the log below:
 
