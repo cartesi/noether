@@ -10,17 +10,21 @@
 // specific language governing permissions and limitations under the License.
 
 import log from "loglevel";
-import { PoS } from "@cartesi/pos";
+import { Provider } from "@ethersproject/providers";
+import { formatEther } from "@ethersproject/units";
 
 import { sleep } from "./util";
 import { connect } from "./connection";
 import { produceBlock } from "./block";
 import { hire, retire } from "./worker";
-import { POLLING_INTERVAL } from "./config";
+import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
 
-const produce = async (pos: PoS, user: string) => {
-    while (await produceBlock(pos, user)) {
-        await sleep(POLLING_INTERVAL);
+const checkBalance = async (provider: Provider, address: string) => {
+    const balance = await provider.getBalance(address);
+    if (balance.lt(BALANCE_THRESHOLD)) {
+        log.warn(
+            `low balance: ${formatEther(balance)} ETH, transfer more funds`
+        );
     }
 };
 
@@ -48,5 +52,14 @@ export const app = async (
     log.info(`worker hired by ${user}`);
 
     // loop forever
-    await produce(pos, user);
+    while (true) {
+        // check node balance
+        await checkBalance(pos.provider, address);
+
+        // check and try to produce a block
+        await produceBlock(pos, user);
+
+        // go to sleep
+        await sleep(POLLING_INTERVAL);
+    }
 };

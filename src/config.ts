@@ -9,8 +9,11 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+import { parseEther } from "@ethersproject/units";
+
 export const TIMEOUT = 24 * 60 * 60 * 1000;
 export const RETRY_INTERVAL = 10000;
 export const POLLING_INTERVAL = 60000;
 export const CONFIRMATIONS = 1;
 export const GAS_MULTIPLIER = 160;
+export const BALANCE_THRESHOLD = parseEther("0.01");
