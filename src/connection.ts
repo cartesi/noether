@@ -13,7 +13,7 @@ import fs from "fs";
 import { ethers, Wallet } from "ethers";
 import log from "loglevel";
 import { retryDecorator, NotRetryableError } from "ts-retry-promise";
-import readlineSync from "readline-sync";
+import prompts from "prompts";
 import { RETRY_INTERVAL, TIMEOUT } from "./config";
 import { createPoS, createWorkerManager } from "./contracts";
 
@@ -26,8 +26,7 @@ const loadWallet = async (
     if (!fs.existsSync(filename)) {
         if (!create) {
             // did not ask to create wallet if non-existant, raise an error
-            log.error(`file ${filename} not found`);
-            throw new NotRetryableError(`wallet ${filename} not found`);
+            throw new Error(`file ${filename} not found`);
         }
 
         // create new wallet
@@ -35,17 +34,15 @@ const loadWallet = async (
         const wallet = Wallet.createRandom();
 
         // create encrypted structured
-        const password = readlineSync.questionNewPassword(
-            "input new password: ",
-            {
-                cancel: true,
-                caseSensitive: true,
-                min: 8,
-            }
-        );
-        const json = await wallet.encrypt(password);
+        const password = await prompts({
+            type: "password",
+            name: "value",
+            message: "new password",
+        });
+        const json = await wallet.encrypt(password.value);
 
         // save key V3
+        log.info(`saving encrypted wallet to ${filename}`);
         fs.writeFileSync(filename, json);
 
         return wallet;
@@ -54,22 +51,21 @@ const loadWallet = async (
         const json = fs.readFileSync(filename, "utf-8");
 
         // read password from stdin
-        const password = readlineSync.question("password: ", {
-            cancel: true,
-            hideEchoBack: true,
-            mask: "*",
-            caseSensitive: true,
+        const password = await prompts({
+            type: "password",
+            name: "value",
+            message: "password",
         });
 
         // load wallet
-        return Wallet.fromEncryptedJson(json, password);
+        return Wallet.fromEncryptedJson(json, password.value);
     }
 };
 
 const _connect = async (
     url: string,
     accountIndex: number,
-    wallet: string | undefined,
+    walletFile: string | undefined,
     create: boolean
 ) => {
     log.info(`connecting to ${url}...`);
@@ -80,9 +76,13 @@ const _connect = async (
     log.info(`connected to network '${network.name}' (${network.chainId})`);
 
     // create signer either from wallet or use provider as signer
-    const signer = wallet
-        ? (await loadWallet(wallet, create)).connect(provider)
-        : provider.getSigner(accountIndex);
+    let signer;
+    if (walletFile) {
+        const wallet = await loadWallet(walletFile, create);
+        signer = wallet.connect(provider);
+    } else {
+        signer = provider.getSigner(accountIndex);
+    }
 
     const address = await signer.getAddress();
     log.info(`starting worker ${address}`);
@@ -102,7 +102,7 @@ const _connect = async (
 };
 
 export const connect = retryDecorator(_connect, {
-    logger: log.warn,
+    logger: (msg) => log.error(msg),
     delay: RETRY_INTERVAL,
     retries: "INFINITELY",
     timeout: TIMEOUT,

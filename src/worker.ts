@@ -82,7 +82,7 @@ export const retire = async (workerManager: WorkerManager) => {
 };
 
 export const hire = retryDecorator(_hire, {
-    logger: log.warn,
+    logger: (msg) => log.error(msg),
     delay: RETRY_INTERVAL,
     retries: "INFINITELY",
     timeout: TIMEOUT,
