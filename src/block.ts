@@ -96,9 +96,9 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                     reward
                 )} CTSI...`
             );
-            const gasPrice = await pos.signer.getGasPrice();
+            const gasLimit = await pos.estimateGas.produceBlock(chainId);
             const tx = await pos.produceBlock(chainId, {
-                gasPrice: gasPrice,
+                gasLimit: gasLimit.mul(GAS_MULTIPLIER).div(100),
             });
             log.info(
                 `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
