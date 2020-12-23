@@ -9,8 +9,11 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import log from "loglevel";
 import axios from "axios";
+import chalk from "chalk";
+import log from "loglevel";
+
+let first = true;
 
 // structure of Auth token (JWT)
 interface JWT {
@@ -60,15 +63,27 @@ export const checkVersion = async () => {
     try {
         const digest = process.env.DIGEST;
         if (digest) {
+            const image = "cartesi/noether";
+            const tag = "latest";
+
             // fetch version from docker hub
-            const latest = await fetchVersion("cartesi/noether", "latest");
+            const latest = await fetchVersion(image, tag);
             if (latest && digest !== latest) {
                 log.warn(
-                    `running version ${digest}, latest ${latest}, stop and restart your node to update`
+                    `running version ${digest}, latest ${latest}, stop your node, do a "${chalk.blue(
+                        `docker pull ${image}:${tag}`
+                    )}" and restart`
                 );
+            }
+        } else {
+            if (first) {
+                log.warn(
+                    `no DIGEST environment variable set, turning off node version checking`
+                );
+                first = false;
             }
         }
     } catch (e) {
-        log.error(`error checking node version`);
+        log.error(`error checking node version`, e);
     }
 };
