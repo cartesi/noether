@@ -17,4 +17,4 @@ export const POLLING_INTERVAL = 60000;
 export const CONFIRMATIONS = 1;
 export const CONFIRMATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 export const GAS_MULTIPLIER = 160;
-export const BALANCE_THRESHOLD = parseEther("0.01");
+export const BALANCE_THRESHOLD = parseEther("0.05");
