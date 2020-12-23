@@ -53,11 +53,20 @@ export const app = async (
 
     // loop forever
     while (true) {
-        // check node balance
-        await checkBalance(pos.provider, address);
+        try {
+            // check if node retired
+            if (!(await retire(workerManager, address))) {
+                break;
+            }
 
-        // check and try to produce a block
-        await produceBlock(pos, user);
+            // check node balance
+            await checkBalance(pos.provider, address);
+
+            // check and try to produce a block
+            await produceBlock(pos, user);
+        } catch (e) {
+            log.error(e);
+        }
 
         // go to sleep
         await sleep(POLLING_INTERVAL);

@@ -10,6 +10,7 @@
 // specific language governing permissions and limitations under the License.
 
 import log from "loglevel";
+import { formatEther } from "ethers/lib/utils";
 import { retryDecorator } from "ts-retry-promise";
 import { WorkerManager } from "@cartesi/util";
 import { sleep } from "./util";
@@ -75,10 +76,49 @@ const _hire = async (
     return undefined;
 };
 
-export const retire = async (workerManager: WorkerManager) => {
-    // TODO:
-    log.warn(`retirement not implemented`);
-    return;
+export const retire = async (
+    workerManager: WorkerManager,
+    address: string
+): Promise<boolean> => {
+    const retired = await workerManager.isRetired(address);
+    if (retired) {
+        const provider = workerManager.provider;
+        const signer = workerManager.signer;
+
+        // get who is the node owner
+        const user = await workerManager.getUser(address);
+
+        // get this node remaining balance
+        const balance = await provider.getBalance(address);
+
+        // estimate gas of transaction
+        const gas = await provider.estimateGas({
+            to: user,
+            value: balance,
+        });
+
+        // get gas price from provider
+        const gasPrice = await provider.getGasPrice();
+
+        // calculate the fees
+        const fee = gasPrice.mul(gas);
+
+        // send transaction returning all remaining balance to owner
+        const value = balance.sub(fee);
+        log.info(
+            `node retired, returning ${formatEther(value)} ETH to user ${user}`
+        );
+        const tx = await signer.sendTransaction({
+            to: user,
+            value,
+        });
+        log.info(`transaction ${tx.hash}, waiting for confirmation...`);
+        const receipt = await tx.wait(CONFIRMATIONS);
+        log.debug(`gas used: ${receipt.gasUsed}`);
+
+        return false;
+    }
+    return true;
 };
 
 export const hire = retryDecorator(_hire, {
