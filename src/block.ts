@@ -126,21 +126,17 @@ export const produceBlock = async (
     pos: PoS,
     user: string
 ): Promise<Boolean> => {
-    try {
-        // number of chains
-        const index = await pos.currentIndex();
+    // number of chains
+    const index = await pos.currentIndex();
 
-        if (index.isZero()) {
-            log.debug(`no chains`);
-            return true;
-        }
+    if (index.isZero()) {
+        log.debug(`no chains`);
+        return true;
+    }
 
-        // loop through all chains, each at a time
-        for (let chainId = 0; chainId < index.toNumber(); chainId++) {
-            await produceChainBlock(pos, user, chainId);
-        }
-    } catch (e) {
-        log.error(e.message);
+    // loop through all chains, each at a time
+    for (let chainId = 0; chainId < index.toNumber(); chainId++) {
+        await produceChainBlock(pos, user, chainId);
     }
     return true;
 };

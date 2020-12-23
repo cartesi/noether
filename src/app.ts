@@ -17,6 +17,7 @@ import { sleep } from "./util";
 import { connect } from "./connection";
 import { produceBlock } from "./block";
 import { hire, retire } from "./worker";
+import { checkVersion } from "./version";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
 
 const checkBalance = async (provider: Provider, address: string) => {
@@ -54,6 +55,9 @@ export const app = async (
     // loop forever
     while (true) {
         try {
+            // check software version
+            await checkVersion();
+
             // check if node retired
             if (!(await retire(workerManager, address))) {
                 break;

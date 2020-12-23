@@ -23,7 +23,7 @@ Instructions for each environment are presented in the following sections.
 To run the Noether node on mainnet, just execute the command below:
 
 ```
-docker run -it --rm --name cartesi_noether -v cartesi_wallet:/root/.ethereum cartesi/noether --url https://eth.cartesi.io --wallet /root/.ethereum/key --create --verbose
+docker run -it --rm --pull always --name cartesi_noether -e DIGEST=$(docker images --no-trunc --quiet cartesi/noether:latest) -v cartesi_wallet:/root/.ethereum cartesi/noether:latest --url https://eth.cartesi.io --wallet /root/.ethereum/key --create --verbose
 ```
 
 This will launch a Docker container named `cartesi_noether`, and also create a local Docker volume called `cartesi_wallet`.
