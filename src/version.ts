@@ -58,10 +58,10 @@ const fetchVersion = async (
 };
 
 export const checkVersion = async () => {
-    // expect a DIGEST env var injected with the output of the following command:
+    // expect a VERSION env var injected with the output of the following command:
     // docker images --no-trunc --quiet cartesi/noether:latest
     try {
-        const digest = process.env.DIGEST;
+        const digest = process.env.VERSION;
         if (digest) {
             const image = "cartesi/noether";
             const tag = "latest";
@@ -78,7 +78,7 @@ export const checkVersion = async () => {
         } else {
             if (first) {
                 log.warn(
-                    `no DIGEST environment variable set, turning off node version checking`
+                    `no VERSION environment variable set, turning off node version checking`
                 );
                 first = false;
             }
