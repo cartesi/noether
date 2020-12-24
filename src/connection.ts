@@ -12,7 +12,7 @@
 import fs from "fs";
 import { ethers, Wallet } from "ethers";
 import log from "loglevel";
-import { retryDecorator, NotRetryableError } from "ts-retry-promise";
+import { retryDecorator } from "ts-retry-promise";
 import prompts from "prompts";
 import { RETRY_INTERVAL, TIMEOUT } from "./config";
 import { createPoS, createWorkerManager } from "./contracts";
@@ -77,10 +77,19 @@ const _connect = async (
 
     // create signer either from wallet or use provider as signer
     let signer;
+
     if (walletFile) {
         const wallet = await loadWallet(walletFile, create);
         signer = wallet.connect(provider);
+    } else if (process.env.MNEMONIC) {
+        // create signer from mnemonic environment variable
+        const mnemonic = process.env.MNEMONIC;
+        const path = process.env.MNEMONIC_PATH;
+        log.info(`loading wallet from MNEMONIC environment variable`);
+        const wallet = Wallet.fromMnemonic(mnemonic, path);
+        signer = wallet.connect(provider);
     } else {
+        log.info(`using provider account ${accountIndex} as signer`);
         signer = provider.getSigner(accountIndex);
     }
 
