@@ -53,6 +53,20 @@ For that matter, you can use the [Cartesi Explorer](https://explorer.cartesi.io)
 - Go to https://explorer.cartesi.io and connect to your personal wallet using [MetaMask](https://metamask.io).
 - [Click on "Staking"](https://explorer.cartesi.io/staking), and then on `"Click to hire node"`. Fill in the form with your node address (which in this example is `0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9`), set the amount of ETH you want to send to your node wallet, and click `"Hire Node"`. This will send a transaction and make your node "wake up" and start working on your behalf. The amount of ETH you decide to send depends on how long you expect to keep your node running. Each block you produce can be estimated to spend around `156454` gas units, so it is possible to [calculate](https://ethgasstation.info/calculatorTxV.php) how much ETH you will spend based on the network gas price. You should keep an eye on your node funds, and restock it whenever you deem necessary.
 
+### Running on Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/cartesi-corp/noether/tree/feature/heroku)
+
+You can also use Heroku to run a node, by simply clicking the button above.
+You need a Heroku account. A [free account](https://www.heroku.com/pricing) will give you 550 dyno hours per month which is not enough to run the node 24x7, however by adding a credit card to your account you get more 450 hours/month.
+
+The Noether application has no web dyno, so it doesn't sleep in the free account plan. It has only one worker dyno.
+For a production environment consider to use a paid account.
+
+Once the application is running you have to check its log using Heroku dashboard or CLI to know the address you should hire.
+
+Heroku does not provide a persistent disk storage, so we can't store the encrypted wallet on disk. Instead we use a [random seed](https://devcenter.heroku.com/articles/app-json-schema#env) created by Heroku during deployment, and stored in the application [environment variables](https://devcenter.heroku.com/articles/config-vars). Keep in mind that this is not the safest solution, but once the node is hired it will only work for its owner. The funds in the node should be kept at a level just for block production.
+
 ## Goerli public network
 
 Running on [Goerli](https://goerli.net) is very similar to running on `mainnet`, with the following differences:
