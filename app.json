@@ -1,0 +1,24 @@
+{
+    "name": "Noether",
+    "description": "Cartesi Proof of Stake worker node",
+    "repository": "https://github.com/cartesi/noether",
+    "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/main/public/node.svg",
+    "keywords": ["cartesi", "ethereum"],
+    "image": "heroku/nodejs",
+    "env": {
+        "SEED": {
+            "description": "Ethereum wallet seed",
+            "generator": "secret"
+        }
+    },
+    "formation": {
+        "web": {
+            "quantity": 0
+        },
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        }
+    },
+    "stack": "heroku-20"
+}

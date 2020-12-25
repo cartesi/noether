@@ -11,6 +11,7 @@
 
 import fs from "fs";
 import { ethers, Wallet } from "ethers";
+import { HDNode } from "@ethersproject/hdnode";
 import log from "loglevel";
 import { retryDecorator } from "ts-retry-promise";
 import prompts from "prompts";
@@ -88,6 +89,11 @@ const _connect = async (
         log.info(`loading wallet from MNEMONIC environment variable`);
         const wallet = Wallet.fromMnemonic(mnemonic, path);
         signer = wallet.connect(provider);
+    } else if (process.env.SEED) {
+        const seed = process.env.SEED;
+        log.info(`loading wallet from SEED environment variable`);
+        const hd = HDNode.fromSeed(`0x${seed}`);
+        signer = new Wallet(hd, provider);
     } else {
         log.info(`using provider account ${accountIndex} as signer`);
         signer = provider.getSigner(accountIndex);

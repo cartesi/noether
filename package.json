@@ -26,6 +26,9 @@
     "@types/yargs": "^15.0.12",
     "prettier": "2.2.1"
   },
+  "engines": {
+    "node": "15.x"
+  },
   "name": "noether",
   "version": "0.1.0",
   "description": "Noether Node",
