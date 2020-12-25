@@ -27,7 +27,9 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
     const active = await pos.isActive(chainId);
     if (!active) {
-        log.debug(`[chain ${chainId}] inactive`);
+        if (chainId > 0) {
+            log.debug(`[chain ${chainId}] inactive`);
+        }
         return;
     }
 
