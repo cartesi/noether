@@ -21,7 +21,7 @@ let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
     return yargs
         .option("url", {
             describe: "URL of the Ethereum node",
-            default: "http://localhost:8545",
+            default: process.env.URL || "http://localhost:8545",
         })
         .option("wallet", {
             describe: "Filename of JSON wallet file",
