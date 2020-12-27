@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@cartesi/pos@^0.1.0-beta.23":
-  version "0.1.0-beta.23"
-  resolved "https://registry.yarnpkg.com/@cartesi/pos/-/pos-0.1.0-beta.23.tgz#600aa38f62382d33f59b8630880200867a8f2061"
-  integrity sha512-yW9I4kswXRpfUEb35JcWRt9H78oiurRcjAqqtbTP75Be0acBrA/2Pb7zaflbrA2ibalDtalbw8WqwSPvbS74vQ==
+"@cartesi/pos@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@cartesi/pos/-/pos-1.0.0.tgz#3e5dce627c895dd816ecaa5cce905c5a40e7fc15"
+  integrity sha512-jUJJqY3pB2qFEAuW0YfLSOmR2S5RG88n1dyEr51herrxHTB6C3OG+ixY68m4UXNgw3f3h3EYqCI0xTnLx2T2XQ==
   dependencies:
     "@cartesi/token" "^1.2.5"
     "@cartesi/util" "^1.0.0"
