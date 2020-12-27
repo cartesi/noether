@@ -55,7 +55,7 @@ For that matter, you can use the [Cartesi Explorer](https://explorer.cartesi.io)
 
 ### Running on Heroku
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/cartesi-corp/noether/tree/feature/heroku)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 You can also use Heroku to run a node, by simply clicking the button above.
 You need a Heroku account. A [free account](https://www.heroku.com/pricing) will give you 550 dyno hours per month which is not enough to run the node 24x7, however by adding a credit card to your account you get more 450 hours/month.
