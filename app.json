@@ -6,6 +6,10 @@
     "keywords": ["cartesi", "ethereum"],
     "image": "heroku/nodejs",
     "env": {
+        "URL": {
+            "description": "Ethereum node URL",
+            "value": "https://eth.cartesi.io"
+        },
         "SEED": {
             "description": "Ethereum wallet seed",
             "generator": "secret"
