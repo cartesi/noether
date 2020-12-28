@@ -2,7 +2,7 @@
     "name": "Noether",
     "description": "Cartesi Proof of Stake worker node",
     "repository": "https://github.com/cartesi/noether",
-    "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/main/public/node.svg",
+    "logo": "https://cartesi.io/logos/cartesi-icon-light-theme.svg",
     "keywords": ["cartesi", "ethereum"],
     "image": "heroku/nodejs",
     "env": {
