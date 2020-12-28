@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
+    "export": "ts-node src/index.ts export",
     "start": "ts-node src/index.ts start"
   },
   "dependencies": {

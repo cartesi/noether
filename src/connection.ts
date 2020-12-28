@@ -18,7 +18,7 @@ import prompts from "prompts";
 import { RETRY_INTERVAL, TIMEOUT } from "./config";
 import { createPoS, createWorkerManager } from "./contracts";
 
-const loadWallet = async (
+export const loadWallet = async (
     filename: string,
     create: boolean
 ): Promise<Wallet> => {

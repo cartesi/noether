@@ -30,4 +30,4 @@ RUN yarn install --frozen-lockfile
 ## We just need the build to execute the command
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/ ./dist
-ENTRYPOINT ["node", "/app/dist/index.js", "start"]
+ENTRYPOINT ["node", "/app/dist/index.js"]

@@ -11,38 +11,63 @@
 // specific language governing permissions and limitations under the License.
 
 import { app } from "./app";
+import { exportWallet } from "./export";
 import log from "loglevel";
 import chalk from "chalk";
 import prefix from "loglevel-plugin-prefix";
 import yargs, { Argv } from "yargs";
 
 // parse command line
-let argv = yargs.command("start", "Start the node.", (yargs: Argv) => {
-    return yargs
-        .option("url", {
-            describe: "URL of the Ethereum node",
-            default: process.env.URL || "http://localhost:8545",
-        })
-        .option("wallet", {
-            describe: "Filename of JSON wallet file",
-            type: "string",
-        })
-        .option("accountIndex", {
-            describe: "Account index from server to use",
-            default: 0,
-        })
-        .option("create", {
-            describe: "Create a wallet if it doesn't exist",
-            type: "boolean",
-            alias: "c",
-            default: false,
-        })
-        .option("verbose", {
-            type: "boolean",
-            alias: "v",
-            default: false,
-        });
-}).argv;
+let argv = yargs
+    .command(
+        ["start", "$0"],
+        "Start the node.",
+        (yargs: Argv) => {
+            return yargs
+                .option("url", {
+                    describe: "URL of the Ethereum node",
+                    default: process.env.URL || "http://localhost:8545",
+                })
+                .option("wallet", {
+                    describe: "Filename of JSON wallet file",
+                    type: "string",
+                })
+                .option("accountIndex", {
+                    describe: "Account index from server to use",
+                    default: 0,
+                })
+                .option("create", {
+                    describe: "Create a wallet if it doesn't exist",
+                    type: "boolean",
+                    alias: "c",
+                    default: false,
+                })
+                .option("verbose", {
+                    type: "boolean",
+                    alias: "v",
+                    default: false,
+                });
+        },
+        (args) => app(args.url, args.accountIndex, args.wallet, args.create)
+    )
+    .command(
+        "export",
+        "Export encrypted wallet file to mnemonic",
+        (yargs: Argv) => {
+            return yargs
+                .option("wallet", {
+                    describe: "Filename of JSON wallet file",
+                    type: "string",
+                    default: "/root/.ethereum/key",
+                })
+                .option("verbose", {
+                    type: "boolean",
+                    alias: "v",
+                    default: false,
+                });
+        },
+        (args) => exportWallet(args.wallet)
+    ).argv;
 
 // setup shinny log prefix
 prefix.reg(log);
@@ -64,6 +89,3 @@ prefix.apply(log, {
 
 // set log level according to verbose option, 0 is trace, 2 is info
 log.setLevel(argv.verbose ? 0 : 2);
-
-// run the app
-app(argv.url, argv.accountIndex, argv.wallet, argv.create);
