@@ -59,7 +59,7 @@ export const app = async (
             await checkVersion();
 
             // check if node retired
-            if (!(await retire(workerManager, address))) {
+            if (await retire(workerManager, address)) {
                 break;
             }
 

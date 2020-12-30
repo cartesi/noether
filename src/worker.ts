@@ -32,10 +32,8 @@ const _hire = async (
         return workerManager.getOwner(address);
     }
 
-    const retired = await workerManager.isRetired(address);
-    if (retired) {
-        log.warn(`${address} retired`);
-        // TODO: call retire method
+    if (await retire(workerManager, address)) {
+        // if retire returns true, exit
         process.exit(0);
     }
 
@@ -91,6 +89,11 @@ export const retire = async (
         // get this node remaining balance
         const balance = await provider.getBalance(address);
 
+        if (balance.isZero()) {
+            log.info(`node retired, zero balance`);
+            return true;
+        }
+
         // estimate gas of transaction
         const gas = await provider.estimateGas({
             to: user,
@@ -116,9 +119,9 @@ export const retire = async (
         const receipt = await tx.wait(CONFIRMATIONS);
         log.debug(`gas used: ${receipt.gasUsed}`);
 
-        return false;
+        return true;
     }
-    return true;
+    return false;
 };
 
 export const hire = retryDecorator(_hire, {
