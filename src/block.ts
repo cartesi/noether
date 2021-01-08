@@ -90,7 +90,7 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
         staked
     );
 
-    log.debug(`[chain ${chainId}] canProduce=${canProduce}`);
+    log.debug(`[chain ${chainId}] eligibleForNextBlock=${canProduce}`);
     if (canProduce) {
         try {
             log.info(
