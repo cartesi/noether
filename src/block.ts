@@ -103,7 +103,7 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
 
             const tx = await pos.produceBlock(chainId, {
                 gasLimit: gasLimit.mul(GAS_MULTIPLIER).div(100),
-                nonce: nonce
+                nonce: nonce,
             });
             log.info(
                 `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
