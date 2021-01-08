@@ -99,10 +99,7 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                 )} CTSI...`
             );
             const gasLimit = await pos.estimateGas.produceBlock(chainId);
-            const nonce = await pos.provider.getTransactionCount(
-                await pos.signer.getAddress(),
-                "latest"
-            );
+            const nonce = pos.signer.getTransactionCount("latest");
 
             const tx = await pos.produceBlock(chainId, {
                 gasLimit: gasLimit.mul(GAS_MULTIPLIER).div(100),
