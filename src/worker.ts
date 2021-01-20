@@ -16,11 +16,13 @@ import { WorkerManager } from "@cartesi/util";
 import { sleep } from "./util";
 import {
     CONFIRMATIONS,
-    GAS_MULTIPLIER,
     POLLING_INTERVAL,
     RETRY_INTERVAL,
     TIMEOUT,
 } from "./config";
+import { updateGasPrice } from "./gas-price-updater";
+import { getGasPrice } from "./gas-price";
+import { Overrides } from "@ethersproject/contracts";
 
 const _hire = async (
     workerManager: WorkerManager,
@@ -54,18 +56,13 @@ const _hire = async (
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
 
-        // get gas price from provider
-        const currentGasPrice = await workerManager.provider.getGasPrice();
-
         // increase the price
-        const gasPrice = currentGasPrice.mul(16).div(10);
-        log.debug(
-            `gasPrice: ${gasPrice} = ${currentGasPrice} * ${GAS_MULTIPLIER} / 100`
-        );
+        await updateGasPrice();
+        const gasPrice = getGasPrice();
 
-        const tx = await workerManager.acceptJob({
-            gasPrice: gasPrice,
-        });
+        const overrides: Overrides = {};
+        if (gasPrice) overrides.gasPrice = gasPrice;
+        const tx = await workerManager.acceptJob(overrides);
         log.info(`transaction ${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(CONFIRMATIONS);
         log.debug(`gas used: ${receipt.gasUsed}`);

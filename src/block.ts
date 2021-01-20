@@ -21,7 +21,10 @@ import {
     createRewardManager,
 } from "./contracts";
 
-import { CONFIRMATIONS, CONFIRMATION_TIMEOUT, GAS_MULTIPLIER } from "./config";
+import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "./config";
+import { getGasPrice } from "./gas-price";
+import { Overrides } from "@ethersproject/contracts";
+import { updateGasPrice } from "./gas-price-updater";
 
 const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
@@ -113,13 +116,13 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                     reward
                 )} CTSI...`
             );
-            const gasLimit = await pos.estimateGas.produceBlock(chainId);
             const nonce = pos.signer.getTransactionCount("latest");
+            await updateGasPrice();
+            const gasPrice = getGasPrice();
 
-            const tx = await pos.produceBlock(chainId, {
-                gasLimit: gasLimit.mul(GAS_MULTIPLIER).div(100),
-                nonce: nonce,
-            });
+            const overrides: Overrides = { nonce };
+            if (gasPrice) overrides.gasPrice = gasPrice;
+            const tx = await pos.produceBlock(chainId, overrides);
             log.info(
                 `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
             );
