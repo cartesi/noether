@@ -57,7 +57,7 @@ const _hire = async (
         log.info(`accepting job from ${user}...`);
 
         // increase the price
-        await updateGasPrice();
+        await updateGasPrice(workerManager.provider);
         const gasPrice = getGasPrice();
 
         const overrides: Overrides = {};

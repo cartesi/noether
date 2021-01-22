@@ -12,7 +12,7 @@ import { Provider } from "@ethersproject/abstract-provider";
 export const updateGasPrice = async (
     provider: Provider | null = null
 ): Promise<void> => {
-    let gasPrice = null;
+    let gasPrice: BigNumber | null = null;
     try {
         const average = await requestGasStationAveragePrice();
         gasPrice = gasStationPriceToBigNumber(average);
@@ -22,10 +22,12 @@ export const updateGasPrice = async (
             gasPrice = await fetchProviderPrice(provider);
         }
     }
-    setGasPrice(gasPrice);
-    log.info("gas price updated", {
-        gasPrice: gasPrice && gasPrice.toString(),
-    });
+    if(gasPrice) {
+        setGasPrice(gasPrice);
+        log.info("gas price updated", {
+            gasPrice: gasPrice && gasPrice.toString(),
+        });
+    }
 };
 
 const requestGasStationAveragePrice = async (): Promise<number> => {
