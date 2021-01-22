@@ -1,6 +1,6 @@
 import log from "loglevel";
 import { expect } from "chai";
-import sinon from "sinon";
+import sinon, { SinonSpy } from "sinon";
 import { updateGasPrice } from "./gas-price-updater";
 import axios from "axios";
 import { getGasPrice, setGasPrice } from "./gas-price";
@@ -17,20 +17,23 @@ describe("gas price updater test suite", () => {
     });
 
     it("should update gas price", async () => {
-        sandbox.stub(axios, "get").returns(
+        let axiosGetSpy: SinonSpy;
+        axiosGetSpy = sandbox.stub(axios, "get").returns(
             Promise.resolve({
                 data: { average: 450 },
             })
         );
-        await updateGasPrice();
+        await updateGasPrice(null, true);
+        expect(axiosGetSpy.callCount).to.be.eq(1);
         expect(getGasPrice()!.toString()).to.be.eq("45000000000");
         sandbox.restore();
-        sandbox.stub(axios, "get").returns(
+        axiosGetSpy = sandbox.stub(axios, "get").returns(
             Promise.resolve({
                 data: { average: 750 },
             })
         );
-        await updateGasPrice();
+        await updateGasPrice(null, true);
+        expect(axiosGetSpy.callCount).to.be.eq(1);
         expect(getGasPrice()!.toString()).to.be.eq("75000000000");
     });
 
@@ -40,12 +43,12 @@ describe("gas price updater test suite", () => {
                 data: { average: 450 },
             })
         );
-        await updateGasPrice();
+        await updateGasPrice(null, true);
         expect(getGasPrice()!.toString()).to.be.eq("45000000000");
         sandbox.restore();
         sandbox.stub(log, "error").returns();
         sandbox.stub(axios, "get").returns(Promise.reject("test error"));
-        await updateGasPrice();
+        await updateGasPrice(null, true);
         expect(getGasPrice()!.toString()).to.be.eq("45000000000");
     });
 
@@ -55,12 +58,12 @@ describe("gas price updater test suite", () => {
                 data: { average: 450 },
             })
         );
-        await updateGasPrice();
+        await updateGasPrice(null, true);
         expect(getGasPrice()!.toString()).to.be.eq("45000000000");
         sandbox.restore();
         sandbox.stub(log, "error").returns();
         sandbox.stub(axios, "get").returns(Promise.resolve({ data: {} }));
-        await updateGasPrice();
+        await updateGasPrice(null, true);
         expect(getGasPrice()!.toString()).to.be.eq("45000000000");
     });
 
@@ -73,7 +76,23 @@ describe("gas price updater test suite", () => {
                 gasPrice: networkGasPrice.toString(),
             },
         });
+        await updateGasPrice(provider, true);
+        const expectedGasPrice = BigNumber.from(networkGasPrice)
+            .mul(GAS_MULTIPLIER)
+            .div(100);
+        expect(getGasPrice()!.toString()).to.be.eq(expectedGasPrice.toString());
+    });
+
+    it("should not use gas station by default", async () => {
+        const axiosGetSpy = sandbox.spy(axios, "get");
+        const networkGasPrice = BigNumber.from("20000000000");
+        const provider = new MockProvider({
+            ganacheOptions: {
+                gasPrice: networkGasPrice.toString(),
+            },
+        });
         await updateGasPrice(provider);
+        expect(axiosGetSpy.called).to.be.false;
         const expectedGasPrice = BigNumber.from(networkGasPrice)
             .mul(GAS_MULTIPLIER)
             .div(100);

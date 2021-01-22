@@ -10,17 +10,20 @@ import { setGasPrice } from "./gas-price";
 import { Provider } from "@ethersproject/abstract-provider";
 
 export const updateGasPrice = async (
-    provider: Provider | null = null
+    provider: Provider | null = null,
+    useGasStation: boolean = false
 ): Promise<void> => {
     let gasPrice: BigNumber | null = null;
-    try {
-        const average = await requestGasStationAveragePrice();
-        gasPrice = gasStationPriceToBigNumber(average);
-    } catch (error) {
-        log.error("failed to retrieve gas price", { error });
-        if (provider) {
-            gasPrice = await fetchProviderPrice(provider);
+    if (useGasStation) {
+        try {
+            const average = await requestGasStationAveragePrice();
+            gasPrice = gasStationPriceToBigNumber(average);
+        } catch (error) {
+            log.error("failed to retrieve gas price", { error });
         }
+    }
+    if (!gasPrice && provider) {
+        gasPrice = await fetchProviderPrice(provider);
     }
     if (gasPrice) {
         setGasPrice(gasPrice);
