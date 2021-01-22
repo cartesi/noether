@@ -102,7 +102,7 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                 )} CTSI...`
             );
             const nonce = pos.signer.getTransactionCount("latest");
-            await updateGasPrice(pos.provider);
+            await updateGasPrice(pos.provider, chainId === 1);
             const gasPrice = getGasPrice();
 
             const overrides: Overrides = { nonce };
