@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.prod.json",
     "export": "ts-node src/index.ts export",
     "start": "ts-node src/index.ts start",
     "test": "mocha",
@@ -23,8 +23,8 @@
     "yargs": "^16.2.0"
   },
   "devDependencies": {
+    "@ethereum-waffle/provider": "^3.2.1",
     "@types/chai": "^4.2.14",
-    "@types/ganache-core": "^2.7.0",
     "@types/humanize-duration": "^3.18.1",
     "@types/mocha": "^8.2.0",
     "@types/moxios": "^0.4.9",
@@ -33,7 +33,6 @@
     "@types/sinon": "^9.0.10",
     "@types/yargs": "^15.0.12",
     "chai": "^4.2.0",
-    "ganache-core": "^2.13.2",
     "mocha": "^8.2.1",
     "moxios": "^0.4.0",
     "prettier": "2.2.1",

@@ -8,5 +8,8 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "outDir": "dist"
-    }
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
 }
