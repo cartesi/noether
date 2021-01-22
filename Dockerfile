@@ -9,7 +9,8 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY yarn.lock ./
 COPY tsconfig.json ./
-RUN yarn install --frozen-lockfile
+COPY tsconfig.prod.json ./
+RUN apk add --no-cache git && yarn install --frozen-lockfile
 COPY ./src ./src
 RUN yarn run build
 
@@ -25,9 +26,8 @@ ENV NODE_ENV=production
 
 COPY package.json ./
 COPY yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN apk add --no-cache git && yarn install --frozen-lockfile
 
 ## We just need the build to execute the command
 COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/ ./dist
 ENTRYPOINT ["node", "/app/dist/index.js"]

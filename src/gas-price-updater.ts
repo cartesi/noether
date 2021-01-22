@@ -22,7 +22,7 @@ export const updateGasPrice = async (
             gasPrice = await fetchProviderPrice(provider);
         }
     }
-    if(gasPrice) {
+    if (gasPrice) {
         setGasPrice(gasPrice);
         log.info("gas price updated", {
             gasPrice: gasPrice && gasPrice.toString(),
