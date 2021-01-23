@@ -4,7 +4,7 @@ import sinon, { SinonSpy } from "sinon";
 import { updateGasPrice } from "./gas-price-updater";
 import axios from "axios";
 import { getGasPrice, setGasPrice } from "./gas-price";
-import { GAS_MULTIPLIER } from "./config";
+import { GAS_MULTIPLIER, GAS_STATION_API_PROFILE } from "./config";
 import { MockProvider } from "@ethereum-waffle/provider";
 import { BigNumber } from "ethers";
 
@@ -20,7 +20,7 @@ describe("gas price updater test suite", () => {
         let axiosGetSpy: SinonSpy;
         axiosGetSpy = sandbox.stub(axios, "get").returns(
             Promise.resolve({
-                data: { average: 450 },
+                data: { [GAS_STATION_API_PROFILE]: 450 },
             })
         );
         await updateGasPrice(null, true);
@@ -29,7 +29,7 @@ describe("gas price updater test suite", () => {
         sandbox.restore();
         axiosGetSpy = sandbox.stub(axios, "get").returns(
             Promise.resolve({
-                data: { average: 750 },
+                data: { [GAS_STATION_API_PROFILE]: 750 },
             })
         );
         await updateGasPrice(null, true);
@@ -40,7 +40,7 @@ describe("gas price updater test suite", () => {
     it("should not update gas price on api error", async () => {
         sandbox.stub(axios, "get").returns(
             Promise.resolve({
-                data: { average: 450 },
+                data: { [GAS_STATION_API_PROFILE]: 450 },
             })
         );
         await updateGasPrice(null, true);
@@ -52,10 +52,10 @@ describe("gas price updater test suite", () => {
         expect(getGasPrice()!.toString()).to.be.eq("45000000000");
     });
 
-    it("should not update gas price on missing average", async () => {
+    it("should not update gas price on missing price", async () => {
         sandbox.stub(axios, "get").returns(
             Promise.resolve({
-                data: { average: 450 },
+                data: { [GAS_STATION_API_PROFILE]: 450 },
             })
         );
         await updateGasPrice(null, true);
