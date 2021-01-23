@@ -2,8 +2,11 @@ import log from "loglevel";
 import axios from "axios";
 import {
     GAS_MULTIPLIER,
-    GAS_REQUEST_TIMEOUT_MS,
-    GAS_STATION_URL,
+    GAS_STATION_API_REQUEST_TIMEOUT_MS,
+    GAS_STATION_API_ENABLED,
+    GAS_STATION_API_PROFILE,
+    GAS_STATION_API_KEY,
+    GAS_STATION_API_URL,
 } from "./config";
 import { BigNumber } from "ethers";
 import { setGasPrice } from "./gas-price";
@@ -14,10 +17,10 @@ export const updateGasPrice = async (
     useGasStation: boolean = false
 ): Promise<void> => {
     let gasPrice: BigNumber | null = null;
-    if (useGasStation) {
+    if (useGasStation && GAS_STATION_API_ENABLED) {
         try {
-            const average = await requestGasStationAveragePrice();
-            gasPrice = gasStationPriceToBigNumber(average);
+            const gasStationPrice = await requestGasStationPrice();
+            gasPrice = gasStationPriceToBigNumber(gasStationPrice);
         } catch (error) {
             log.error("failed to retrieve gas price", { error });
         }
@@ -33,17 +36,21 @@ export const updateGasPrice = async (
     }
 };
 
-const requestGasStationAveragePrice = async (): Promise<number> => {
+const requestGasStationPrice = async (): Promise<number> => {
     log.debug("fetching gas price");
-    const response = await axios.get(GAS_STATION_URL, {
-        timeout: GAS_REQUEST_TIMEOUT_MS,
+    let url = GAS_STATION_API_URL;
+    if (GAS_STATION_API_KEY) url += `?api-key=${GAS_STATION_API_KEY}`;
+    const response = await axios.get(url, {
+        timeout: GAS_STATION_API_REQUEST_TIMEOUT_MS,
     });
     const { data } = response;
-    const { average } = data;
-    if (typeof average !== "number") {
-        throw new Error("ethgasstation did not return an average price");
+    const gasStationPrice = data[GAS_STATION_API_PROFILE];
+    if (typeof gasStationPrice !== "number") {
+        throw new Error(
+            `ethgasstation did not return a ${GAS_STATION_API_PROFILE} price`
+        );
     }
-    return average;
+    return gasStationPrice;
 };
 
 const gasStationPriceToBigNumber = (gasStationPrice: number): BigNumber => {

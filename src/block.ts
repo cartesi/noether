@@ -21,7 +21,11 @@ import {
     createRewardManager,
 } from "./contracts";
 
-import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "./config";
+import {
+    CONFIRMATIONS,
+    CONFIRMATION_TIMEOUT,
+    GAS_STATION_API_CHAIN_ID,
+} from "./config";
 import { getGasPrice } from "./gas-price";
 import { Overrides } from "@ethersproject/contracts";
 import { updateGasPrice } from "./gas-price-updater";
@@ -102,7 +106,10 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                 )} CTSI...`
             );
             const nonce = pos.signer.getTransactionCount("latest");
-            await updateGasPrice(pos.provider, chainId === 1);
+            await updateGasPrice(
+                pos.provider,
+                chainId === GAS_STATION_API_CHAIN_ID
+            );
             const gasPrice = getGasPrice();
 
             const overrides: Overrides = { nonce };

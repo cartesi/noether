@@ -18,5 +18,10 @@ export const CONFIRMATIONS = 1;
 export const CONFIRMATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 export const GAS_MULTIPLIER = 160;
 export const BALANCE_THRESHOLD = parseEther("0.05");
-export const GAS_STATION_URL = "https://ethgasstation.info/json/ethgasAPI.json";
-export const GAS_REQUEST_TIMEOUT_MS = 10000;
+export const GAS_STATION_API_ENABLED = true;
+export const GAS_STATION_API_CHAIN_ID = 1;
+export const GAS_STATION_API_URL =
+    "https://ethgasstation.info/json/ethgasAPI.json";
+export const GAS_STATION_API_KEY = null;
+export const GAS_STATION_API_PROFILE = "fast";
+export const GAS_STATION_API_REQUEST_TIMEOUT_MS = 10000;
