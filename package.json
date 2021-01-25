@@ -31,7 +31,7 @@
     "node": "15.x"
   },
   "name": "noether",
-  "version": "0.1.0",
+  "version": "1.0.4",
   "description": "Noether Node",
   "main": "index.ts",
   "repository": "https://githut.com/cartesi/noether",
