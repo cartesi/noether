@@ -70,7 +70,7 @@ const _connect = async (
     create: boolean
 ) => {
     log.info(`connecting to ${url}...`);
-    const provider = new ethers.providers.JsonRpcProvider(url);
+    const provider = new ethers.providers.StaticJsonRpcProvider(url);
 
     // get network information
     const network = await provider.getNetwork();
