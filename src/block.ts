@@ -25,6 +25,7 @@ import {
     CONFIRMATIONS,
     CONFIRMATION_TIMEOUT,
     GAS_STATION_API_CHAIN_ID,
+    GAS_LIMIT_MULTIPLIER,
 } from "./config";
 import { getGasPrice } from "./gas-price";
 import { Overrides } from "@ethersproject/contracts";
@@ -106,14 +107,19 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                 )} CTSI...`
             );
             const nonce = pos.signer.getTransactionCount("latest");
+            const gasLimit = await pos.estimateGas.produceBlock(chainId);
             await updateGasPrice(
                 pos.provider,
                 chainId === GAS_STATION_API_CHAIN_ID
             );
             const gasPrice = getGasPrice();
 
-            const overrides: Overrides = { nonce };
+            const overrides: Overrides = {
+                nonce,
+                gasLimit: gasLimit.mul(GAS_LIMIT_MULTIPLIER).div(100),
+            };
             if (gasPrice) overrides.gasPrice = gasPrice;
+
             const tx = await pos.produceBlock(chainId, overrides);
             log.info(
                 `[chain ${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`

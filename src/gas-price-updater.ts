@@ -1,7 +1,7 @@
 import log from "loglevel";
 import axios from "axios";
 import {
-    GAS_MULTIPLIER,
+    GAS_PRICE_MULTIPLIER,
     GAS_STATION_API_REQUEST_TIMEOUT_MS,
     GAS_STATION_API_ENABLED,
     GAS_STATION_API_PROFILE,
@@ -65,5 +65,5 @@ const gasStationPriceToBigNumber = (gasStationPrice: number): BigNumber => {
 const fetchProviderPrice = async (provider: Provider): Promise<BigNumber> => {
     log.info("using provider gas price");
     const currentGasPrice = await provider.getGasPrice();
-    return currentGasPrice.mul(GAS_MULTIPLIER).div(100);
+    return currentGasPrice.mul(GAS_PRICE_MULTIPLIER).div(100);
 };
