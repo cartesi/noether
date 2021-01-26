@@ -4,7 +4,7 @@ import sinon, { SinonSpy } from "sinon";
 import { updateGasPrice } from "./gas-price-updater";
 import axios from "axios";
 import { getGasPrice, setGasPrice } from "./gas-price";
-import { GAS_MULTIPLIER, GAS_STATION_API_PROFILE } from "./config";
+import { GAS_PRICE_MULTIPLIER, GAS_STATION_API_PROFILE } from "./config";
 import { MockProvider } from "@ethereum-waffle/provider";
 import { BigNumber } from "ethers";
 
@@ -78,7 +78,7 @@ describe("gas price updater test suite", () => {
         });
         await updateGasPrice(provider, true);
         const expectedGasPrice = BigNumber.from(networkGasPrice)
-            .mul(GAS_MULTIPLIER)
+            .mul(GAS_PRICE_MULTIPLIER)
             .div(100);
         expect(getGasPrice()!.toString()).to.be.eq(expectedGasPrice.toString());
     });
@@ -94,7 +94,7 @@ describe("gas price updater test suite", () => {
         await updateGasPrice(provider);
         expect(axiosGetSpy.called).to.be.false;
         const expectedGasPrice = BigNumber.from(networkGasPrice)
-            .mul(GAS_MULTIPLIER)
+            .mul(GAS_PRICE_MULTIPLIER)
             .div(100);
         expect(getGasPrice()!.toString()).to.be.eq(expectedGasPrice.toString());
     });
