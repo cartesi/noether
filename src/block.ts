@@ -84,8 +84,9 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
 
     // check if can produce
     const blockSelector = await createBlockSelector(pos, chainId, pos.signer);
+    const blockSelectorIndex = await pos.getBlockSelectorIndex(chainId);
     const canProduce = await blockSelector.canProduceBlock(
-        await pos.getBlockSelectorIndex(chainId),
+        blockSelectorIndex,
         user,
         staked
     );
@@ -93,6 +94,20 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     log.debug(`[chain ${chainId}] eligibleForNextBlock=${canProduce}`);
     if (canProduce) {
         try {
+            const blockSelectorState = await blockSelector.getState(
+                blockSelectorIndex,
+                user
+            );
+            const currentBlock = blockSelectorState[0];
+            const currentGoalBlockNumber = blockSelectorState[1];
+            const blockInterval = currentBlock.sub(currentGoalBlockNumber);
+            if (
+                blockInterval.mod(256).eq(0) ||
+                blockInterval.mod(256).gte(254)
+            ) {
+                return;
+            }
+
             log.info(
                 `[chain ${chainId}] trying to produce block and claim reward of ${formatCTSI(
                     reward
