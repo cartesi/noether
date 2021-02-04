@@ -12,20 +12,13 @@
 import { expect } from "chai";
 import { GAS_STATION_API_CHAIN_ID } from "../config";
 import { MockProvider } from "@ethereum-waffle/provider";
-import sinon from "sinon";
 import rewire from "rewire";
 
 const gasPriceProviderModule = rewire("./gas-price-provider");
 const createGasPriceProvider = gasPriceProviderModule.createGasPriceProvider;
-
 const provider = new MockProvider();
-const sandbox = sinon.createSandbox();
 
 describe("gas price provider test suite", () => {
-    afterEach(() => {
-        sandbox.restore();
-    });
-
     it("should create gas price provider without gas station", () => {
         gasPriceProviderModule.__with__({
             gasStationGasPriceProviderEnabled: false,
