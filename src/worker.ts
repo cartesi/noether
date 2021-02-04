@@ -20,9 +20,8 @@ import {
     RETRY_INTERVAL,
     TIMEOUT,
 } from "./config";
-import { updateGasPrice } from "./gas-price-updater";
-import { getGasPrice } from "./gas-price";
 import { Overrides } from "@ethersproject/contracts";
+import { createGasPriceProvider } from "./gas-price/gas-price-provider";
 
 const _hire = async (
     workerManager: WorkerManager,
@@ -57,11 +56,10 @@ const _hire = async (
         log.info(`accepting job from ${user}...`);
 
         // increase the price
-        await updateGasPrice(workerManager.provider);
-        const gasPrice = getGasPrice();
+        const gasPriceProvider = createGasPriceProvider(workerManager.provider);
+        const gasPrice = await gasPriceProvider.getGasPrice();
+        const overrides: Overrides = { gasPrice };
 
-        const overrides: Overrides = {};
-        if (gasPrice) overrides.gasPrice = gasPrice;
         const tx = await workerManager.acceptJob(overrides);
         log.info(`transaction ${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(CONFIRMATIONS);
