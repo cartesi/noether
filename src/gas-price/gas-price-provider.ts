@@ -30,13 +30,20 @@ export interface GasPriceProvider {
     getGasPrice(): Promise<BigNumber>;
 }
 
+// create module constant for easy monkey-patching during test
+// TODO: make the config mockable
+const gasStationGasPriceProviderEnabled = GAS_STATION_API_ENABLED;
+
 export const createGasPriceProvider = (
     provider: Provider,
     chainId: number | null = null
 ): ChainGasPriceProvider => {
     const gasPriceProviders = [];
 
-    if (GAS_STATION_API_ENABLED && chainId === GAS_STATION_API_CHAIN_ID) {
+    if (
+        gasStationGasPriceProviderEnabled &&
+        chainId === GAS_STATION_API_CHAIN_ID
+    ) {
         const gasStationOpts: GasStationGasPriceProviderOptions = {
             url: GAS_STATION_API_URL,
             key: GAS_STATION_API_KEY,

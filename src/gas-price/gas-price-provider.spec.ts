@@ -12,21 +12,47 @@
 import { expect } from "chai";
 import { GAS_STATION_API_CHAIN_ID } from "../config";
 import { MockProvider } from "@ethereum-waffle/provider";
-import { createGasPriceProvider } from "./gas-price-provider";
+import sinon from "sinon";
+import rewire from "rewire";
+
+const gasPriceProviderModule = rewire("./gas-price-provider");
+const createGasPriceProvider = gasPriceProviderModule.createGasPriceProvider;
 
 const provider = new MockProvider();
+const sandbox = sinon.createSandbox();
 
 describe("gas price provider test suite", () => {
-    it("should create gas price provider without gas station", async () => {
-        const gasPriceProvider = createGasPriceProvider(provider);
-        expect(gasPriceProvider.getGasPriceProviders().length).to.be.eq(1);
+    afterEach(() => {
+        sandbox.restore();
     });
 
-    it("should create gas price provider with gas station", async () => {
-        const gasPriceProvider = createGasPriceProvider(
-            provider,
-            GAS_STATION_API_CHAIN_ID
-        );
-        expect(gasPriceProvider.getGasPriceProviders().length).to.be.eq(2);
+    it("should create gas price provider without gas station", () => {
+        gasPriceProviderModule.__with__({
+            gasStationGasPriceProviderEnabled: false,
+        })(() => {
+            const gasPriceProvider = createGasPriceProvider(provider);
+            expect(gasPriceProvider.chain.length).to.be.eq(1);
+        });
+    });
+
+    it("should create gas price provider with gas station", () => {
+        gasPriceProviderModule.__with__({
+            gasStationGasPriceProviderEnabled: true,
+        })(() => {
+            const gasPriceProvider = createGasPriceProvider(
+                provider,
+                GAS_STATION_API_CHAIN_ID
+            );
+            expect(gasPriceProvider.chain.length).to.be.eq(2);
+        });
+    });
+
+    it("should not use gas station when chain id is not GAS_STATION_API_CHAIN_ID", () => {
+        gasPriceProviderModule.__with__({
+            gasStationGasPriceProviderEnabled: true,
+        })(() => {
+            const gasPriceProvider = createGasPriceProvider(provider);
+            expect(gasPriceProvider.chain.length).to.be.eq(1);
+        });
     });
 });

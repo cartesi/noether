@@ -20,6 +20,10 @@ export default class ChainGasPriceProvider implements GasPriceProvider {
         this.gasPriceProviders = gasPriceProviders;
     }
 
+    get chain(): Array<GasPriceProvider> {
+        return this.gasPriceProviders;
+    }
+
     getGasPrice = async (): Promise<BigNumber> => {
         for (const gasPriceProvider of this.gasPriceProviders) {
             try {
@@ -34,9 +38,5 @@ export default class ChainGasPriceProvider implements GasPriceProvider {
         throw new Error(
             "no valid gas price returned from the chain of gas price providers"
         );
-    };
-
-    getGasPriceProviders = (): Array<GasPriceProvider> => {
-        return this.gasPriceProviders;
     };
 }

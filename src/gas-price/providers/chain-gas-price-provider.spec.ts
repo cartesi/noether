@@ -49,9 +49,7 @@ describe("chain gas price provider test suite", () => {
             gasPriceProvider3,
         ];
         const gasPriceProvider = new ChainGasPriceProvider(gasPriceProviders);
-        expect(gasPriceProvider.getGasPriceProviders()).to.be.eq(
-            gasPriceProviders
-        );
+        expect(gasPriceProvider.chain).to.be.eq(gasPriceProviders);
         const gasPrice = await gasPriceProvider.getGasPrice();
         expect(gasPrice.toString()).to.be.eq("2");
     });
