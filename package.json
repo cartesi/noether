@@ -4,7 +4,7 @@
     "export": "ts-node src/index.ts export",
     "start": "ts-node src/index.ts start",
     "test": "mocha",
-    "prettier": "prettier -w **/*.ts"
+    "prettier": "prettier -w \"**/*.ts\""
   },
   "dependencies": {
     "@cartesi/pos": "^1.0.0",

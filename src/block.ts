@@ -24,12 +24,10 @@ import {
 import {
     CONFIRMATIONS,
     CONFIRMATION_TIMEOUT,
-    GAS_STATION_API_CHAIN_ID,
     GAS_LIMIT_MULTIPLIER,
 } from "./config";
-import { getGasPrice } from "./gas-price";
 import { Overrides } from "@ethersproject/contracts";
-import { updateGasPrice } from "./gas-price-updater";
+import { createGasPriceProvider } from "./gas-price/gas-price-provider";
 
 const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
     // check if chain is active
@@ -106,19 +104,19 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
                     reward
                 )} CTSI...`
             );
-            const nonce = pos.signer.getTransactionCount("latest");
-            const gasLimit = await pos.estimateGas.produceBlock(chainId);
-            await updateGasPrice(
-                pos.provider,
-                chainId === GAS_STATION_API_CHAIN_ID
-            );
-            const gasPrice = getGasPrice();
 
+            const nonce = pos.signer.getTransactionCount("latest");
+            const gasPriceProvider = createGasPriceProvider(
+                pos.provider,
+                chainId
+            );
+            const gasPrice = await gasPriceProvider.getGasPrice();
+            const gasLimit = await pos.estimateGas.produceBlock(chainId);
             const overrides: Overrides = {
                 nonce,
+                gasPrice,
                 gasLimit: gasLimit.mul(GAS_LIMIT_MULTIPLIER).div(100),
             };
-            if (gasPrice) overrides.gasPrice = gasPrice;
 
             const tx = await pos.produceBlock(chainId, overrides);
             log.info(

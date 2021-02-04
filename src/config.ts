@@ -23,6 +23,6 @@ export const GAS_STATION_API_ENABLED = true;
 export const GAS_STATION_API_CHAIN_ID = 1;
 export const GAS_STATION_API_URL =
     "https://ethgasstation.info/json/ethgasAPI.json";
-export const GAS_STATION_API_KEY = null;
+export const GAS_STATION_API_KEY = undefined;
 export const GAS_STATION_API_PROFILE = "fast";
 export const GAS_STATION_API_REQUEST_TIMEOUT_MS = 10000;
