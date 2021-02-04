@@ -15,5 +15,4 @@ export default class ProviderGasPriceProvider implements GasPriceProvider {
         const currentGasPrice = await this.provider.getGasPrice();
         return currentGasPrice.mul(this.gasPriceMultiplier).div(100);
     };
-
 }
