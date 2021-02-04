@@ -12,11 +12,8 @@ export default class ProviderGasPriceProvider implements GasPriceProvider {
     }
 
     getGasPrice = async (): Promise<BigNumber> => {
-        return this.fetchGasStationPrice();
-    };
-
-    private fetchGasStationPrice = async (): Promise<BigNumber> => {
         const currentGasPrice = await this.provider.getGasPrice();
         return currentGasPrice.mul(this.gasPriceMultiplier).div(100);
     };
+
 }
