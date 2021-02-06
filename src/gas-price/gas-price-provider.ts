@@ -30,19 +30,20 @@ export interface GasPriceProvider {
     getGasPrice(): Promise<BigNumber>;
 }
 
-// create module constant for easy monkey-patching during test
+// create module constants for easy monkey-patching during test
 // TODO: make the config mockable
 const gasStationGasPriceProviderEnabled = GAS_STATION_API_ENABLED;
+const gasStationChainId = GAS_STATION_API_CHAIN_ID;
 
-export const createGasPriceProvider = (
-    provider: Provider,
-    chainId: number | null = null
-): ChainGasPriceProvider => {
+export const createGasPriceProvider = async (
+    provider: Provider
+): Promise<ChainGasPriceProvider> => {
     const gasPriceProviders = [];
+    const network = await provider.getNetwork();
 
     if (
         gasStationGasPriceProviderEnabled &&
-        chainId === GAS_STATION_API_CHAIN_ID
+        network.chainId === gasStationChainId
     ) {
         const gasStationOpts: GasStationGasPriceProviderOptions = {
             url: GAS_STATION_API_URL,

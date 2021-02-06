@@ -10,7 +10,6 @@
 // specific language governing permissions and limitations under the License.
 
 import { expect } from "chai";
-import { GAS_STATION_API_CHAIN_ID } from "../config";
 import { MockProvider } from "@ethereum-waffle/provider";
 import rewire from "rewire";
 
@@ -22,8 +21,10 @@ describe("gas price provider test suite", () => {
     it("should create gas price provider without gas station", () => {
         gasPriceProviderModule.__with__({
             gasStationGasPriceProviderEnabled: false,
-        })(() => {
-            const gasPriceProvider = createGasPriceProvider(provider);
+            // default Ganache chain id is 1337
+            gasStationChainId: 1337,
+        })(async () => {
+            const gasPriceProvider = await createGasPriceProvider(provider);
             expect(gasPriceProvider.chain.length).to.be.eq(1);
         });
     });
@@ -31,11 +32,10 @@ describe("gas price provider test suite", () => {
     it("should create gas price provider with gas station", () => {
         gasPriceProviderModule.__with__({
             gasStationGasPriceProviderEnabled: true,
-        })(() => {
-            const gasPriceProvider = createGasPriceProvider(
-                provider,
-                GAS_STATION_API_CHAIN_ID
-            );
+            // default Ganache chain id is 1337
+            gasStationChainId: 1337,
+        })(async () => {
+            const gasPriceProvider = await createGasPriceProvider(provider);
             expect(gasPriceProvider.chain.length).to.be.eq(2);
         });
     });
@@ -43,8 +43,9 @@ describe("gas price provider test suite", () => {
     it("should not use gas station when chain id is not GAS_STATION_API_CHAIN_ID", () => {
         gasPriceProviderModule.__with__({
             gasStationGasPriceProviderEnabled: true,
-        })(() => {
-            const gasPriceProvider = createGasPriceProvider(provider);
+            gasStationChainId: 1,
+        })(async () => {
+            const gasPriceProvider = await createGasPriceProvider(provider);
             expect(gasPriceProvider.chain.length).to.be.eq(1);
         });
     });
