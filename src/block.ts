@@ -106,10 +106,7 @@ const produceChainBlock = async (pos: PoS, user: string, chainId: number) => {
             );
 
             const nonce = pos.signer.getTransactionCount("latest");
-            const gasPriceProvider = createGasPriceProvider(
-                pos.provider,
-                chainId
-            );
+            const gasPriceProvider = await createGasPriceProvider(pos.provider);
             const gasPrice = await gasPriceProvider.getGasPrice();
             const gasLimit = await pos.estimateGas.produceBlock(chainId);
             const overrides: Overrides = {
