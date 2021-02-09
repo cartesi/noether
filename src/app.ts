@@ -15,10 +15,11 @@ import { formatEther } from "@ethersproject/units";
 
 import { sleep } from "./util";
 import { connect } from "./connection";
-import { produceBlock } from "./block";
+import { BlockProducer } from "./block";
 import { hire, retire } from "./worker";
 import { checkVersion } from "./version";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
+import { client1, ProtocolImpl } from "./pos";
 
 const checkBalance = async (provider: Provider, address: string) => {
     const balance = await provider.getBalance(address);
@@ -36,7 +37,7 @@ export const app = async (
     create: boolean
 ) => {
     // connect to node
-    const { address, pos, workerManager } = await connect(
+    const { address, pos, pos1, workerManager } = await connect(
         url,
         accountIndex,
         wallet,
@@ -52,6 +53,13 @@ export const app = async (
     }
     log.info(`worker hired by ${user}`);
 
+    // create block producer for both protocols
+    const blockProducer = new BlockProducer(pos.address, new ProtocolImpl(pos));
+    const blockProducer1 = new BlockProducer(
+        pos1.address,
+        new client1.ProtocolImpl(pos1)
+    );
+
     // loop forever
     while (true) {
         try {
@@ -66,8 +74,9 @@ export const app = async (
             // check node balance
             await checkBalance(pos.provider, address);
 
-            // check and try to produce a block
-            await produceBlock(pos, user);
+            // check and try to produce a block, on both protocols
+            await blockProducer1.produceBlock(user);
+            await blockProducer.produceBlock(user);
         } catch (e) {
             log.error(e);
         }

@@ -16,7 +16,7 @@ import log from "loglevel";
 import { retryDecorator } from "ts-retry-promise";
 import prompts from "prompts";
 import { RETRY_INTERVAL, TIMEOUT } from "./config";
-import { createPoS, createWorkerManager } from "./contracts";
+import { createPoS, createWorkerManager, pos1 } from "./contracts";
 
 export const loadWallet = async (
     filename: string,
@@ -104,6 +104,7 @@ const _connect = async (
 
     // connect to contracts
     const pos = await createPoS(network, signer);
+    const pos1Legacy = await pos1.createPoS(network, signer);
     const workerManager = await createWorkerManager(network, signer);
 
     return {
@@ -112,6 +113,7 @@ const _connect = async (
         signer,
         address,
         pos,
+        pos1: pos1Legacy,
         workerManager,
     };
 };

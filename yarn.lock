@@ -23,10 +23,22 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@cartesi/pos@^1.0.0":
+"@cartesi/pos-1.0@npm:@cartesi/pos@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@cartesi/pos/-/pos-1.0.0.tgz#3e5dce627c895dd816ecaa5cce905c5a40e7fc15"
   integrity sha512-jUJJqY3pB2qFEAuW0YfLSOmR2S5RG88n1dyEr51herrxHTB6C3OG+ixY68m4UXNgw3f3h3EYqCI0xTnLx2T2XQ==
+  dependencies:
+    "@cartesi/token" "^1.2.5"
+    "@cartesi/util" "^1.0.0"
+    "@openzeppelin/contracts" "3.2.1-solc-0.7"
+    commander "^6.1.0"
+  optionalDependencies:
+    fsevents "^2.1.3"
+
+"@cartesi/pos@^1.1.0-alpha.3":
+  version "1.1.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@cartesi/pos/-/pos-1.1.0-alpha.3.tgz#be3f98d36c11a48f152c03e7fb3b3779c77f0697"
+  integrity sha512-1fImOFrcwnxezC0na52Jf8mtz51FbHXYDTRX0xIwZ5XmuB0lDXoIsQoSFO+Z7AR45GP+CJeyAoWFEyF1eOtULA==
   dependencies:
     "@cartesi/token" "^1.2.5"
     "@cartesi/util" "^1.0.0"

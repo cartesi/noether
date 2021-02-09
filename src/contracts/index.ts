@@ -52,3 +52,4 @@ export const getAddress = (
 
 export * from "./util";
 export * from "./pos";
+export * as pos1 from "./pos-1.0";
