@@ -20,6 +20,7 @@ import { hire, retire } from "./worker";
 import { checkVersion } from "./version";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
 import { client1, ProtocolImpl } from "./pos";
+import { createGasPriceProvider } from "./gas-price/gas-price-provider";
 
 const checkBalance = async (provider: Provider, address: string) => {
     const balance = await provider.getBalance(address);
@@ -34,18 +35,23 @@ export const app = async (
     url: string,
     accountIndex: number,
     wallet: string | undefined,
+    gasPriceProviderType: string,
     create: boolean
 ) => {
     // connect to node
-    const { address, pos, pos1, workerManager } = await connect(
+    const { address, pos, pos1, provider, workerManager } = await connect(
         url,
         accountIndex,
         wallet,
         create
     );
 
+    // create gas price provider using eth provider
+    // XXX: option to use eth gas station
+    const gasPriceProvider = await createGasPriceProvider(provider);
+
     // worker hiring
-    const user = await hire(workerManager, address);
+    const user = await hire(workerManager, gasPriceProvider, address);
 
     if (!user) {
         log.error(`failed to hire`);
@@ -54,11 +60,32 @@ export const app = async (
     log.info(`worker hired by ${user}`);
 
     // create block producer for both protocols
-    const blockProducer = new BlockProducer(pos.address, new ProtocolImpl(pos));
+    const blockProducer = new BlockProducer(
+        pos.address,
+        new ProtocolImpl(pos, workerManager, gasPriceProvider)
+    );
     const blockProducer1 = new BlockProducer(
         pos1.address,
-        new client1.ProtocolImpl(pos1)
+        new client1.ProtocolImpl(pos1, workerManager, gasPriceProvider)
     );
+
+    // verify authorization
+    const authorized = await blockProducer.authorize();
+    const authorized1 = await blockProducer.authorize();
+
+    const explorerUrl = "https://explorer.cartesi.io/staking";
+    if (!authorized) {
+        log.error(
+            `worker not authorized to interact with PoS(${pos.address}), please go to ${explorerUrl} and authorize`
+        );
+        return;
+    }
+    if (!authorized1) {
+        log.error(
+            `worker not authorized to interact with PoS(${pos1.address}), please go to ${explorerUrl} and authorize`
+        );
+        return;
+    }
 
     // loop forever
     while (true) {

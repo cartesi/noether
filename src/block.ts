@@ -27,6 +27,10 @@ export class BlockProducer {
         this.client = client;
     }
 
+    async authorize(): Promise<boolean> {
+        return this.client.authorize(this.address);
+    }
+
     async produceBlock(user: string) {
         // number of chains
         const chains = await this.client.getNumberOfChains();

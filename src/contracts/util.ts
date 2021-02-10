@@ -12,7 +12,7 @@
 import { Signer } from "ethers";
 import { Network } from "@ethersproject/providers";
 import {
-    WorkerManager,
+    WorkerManagerAuthManagerImpl,
     WorkerManagerAuthManagerImpl__factory,
 } from "@cartesi/util";
 import { ChainMap, getAddress } from ".";
@@ -30,7 +30,7 @@ const abis: ChainMap = {
 export const createWorkerManager = async (
     network: Network,
     signer: Signer
-): Promise<WorkerManager> => {
+): Promise<WorkerManagerAuthManagerImpl> => {
     const address = getAddress(
         network.chainId,
         abis,

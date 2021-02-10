@@ -4,7 +4,7 @@
 #
 FROM node:15.5.0-alpine AS base
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git python make g++
 
 #
 # Builder stage.

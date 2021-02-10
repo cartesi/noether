@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -48,7 +48,14 @@ let argv = yargs
                     default: false,
                 });
         },
-        (args) => app(args.url, args.accountIndex, args.wallet, args.create)
+        (args) =>
+            app(
+                args.url,
+                args.accountIndex,
+                args.wallet,
+                "provider",
+                args.create
+            )
     )
     .command(
         "export",

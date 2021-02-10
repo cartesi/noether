@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -21,10 +21,11 @@ import {
     TIMEOUT,
 } from "./config";
 import { Overrides } from "@ethersproject/contracts";
-import { createGasPriceProvider } from "./gas-price/gas-price-provider";
+import { GasPriceProvider } from "./gas-price/gas-price-provider";
 
 const _hire = async (
     workerManager: WorkerManager,
+    gasPriceProvider: GasPriceProvider,
     address: string
 ): Promise<string | undefined> => {
     const owned = await workerManager.isOwned(address);
@@ -55,10 +56,7 @@ const _hire = async (
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
 
-        // increase the price
-        const gasPriceProvider = await createGasPriceProvider(
-            workerManager.provider
-        );
+        // evaluate the gas price
         const gasPrice = await gasPriceProvider.getGasPrice();
         const overrides: Overrides = { gasPrice };
 

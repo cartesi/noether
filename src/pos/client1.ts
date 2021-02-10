@@ -10,14 +10,12 @@
 // specific language governing permissions and limitations under the License.
 
 import { BlockSelector, PoS, RewardManager, Staking } from "@cartesi/pos-1.0";
+import { WorkerAuthManager } from "@cartesi/util";
 import { BigNumber, Overrides, ContractTransaction } from "ethers";
-import { ProtocolClient, ChainClient } from ".";
+import { ChainClient, AbstractProtocolClient } from ".";
 import { GAS_LIMIT_MULTIPLIER } from "../config";
 import { pos1 } from "../contracts";
-import {
-    createGasPriceProvider,
-    GasPriceProvider,
-} from "../gas-price/gas-price-provider";
+import { GasPriceProvider } from "../gas-price/gas-price-provider";
 
 class ChainImpl implements ChainClient {
     private pos: PoS;
@@ -30,14 +28,14 @@ class ChainImpl implements ChainClient {
 
     private blockSelector: BlockSelector | undefined;
 
-    private gasPriceProvider: GasPriceProvider | undefined;
+    private gasPriceProvider: GasPriceProvider;
 
-    constructor(pos: PoS, chainId: number) {
+    constructor(pos: PoS, gasPriceProvider: GasPriceProvider, chainId: number) {
         this.pos = pos;
+        this.gasPriceProvider = gasPriceProvider;
         this.chainId = chainId;
         this.rewardManager = undefined;
         this.staking = undefined;
-        this.gasPriceProvider = undefined;
     }
 
     private async getRewardManager(): Promise<RewardManager> {
@@ -49,15 +47,6 @@ class ChainImpl implements ChainClient {
             );
         }
         return this.rewardManager;
-    }
-
-    private async getGasPriceProvider(): Promise<GasPriceProvider> {
-        if (!this.gasPriceProvider) {
-            this.gasPriceProvider = await createGasPriceProvider(
-                this.pos.provider
-            );
-        }
-        return this.gasPriceProvider;
     }
 
     private async getStaking(): Promise<Staking> {
@@ -129,9 +118,8 @@ class ChainImpl implements ChainClient {
     }
 
     async produceBlock(): Promise<ContractTransaction> {
-        const gasPriceProvider = await this.getGasPriceProvider();
         const nonce = this.pos.signer.getTransactionCount("latest");
-        const gasPrice = await gasPriceProvider.getGasPrice();
+        const gasPrice = await this.gasPriceProvider.getGasPrice();
         const gasLimit = await this.pos.estimateGas.produceBlock(this.chainId);
         const overrides: Overrides = {
             nonce,
@@ -143,13 +131,21 @@ class ChainImpl implements ChainClient {
     }
 }
 
-export class ProtocolImpl implements ProtocolClient {
+export class ProtocolImpl extends AbstractProtocolClient {
     private pos: PoS;
+
+    private gasPriceProvider: GasPriceProvider;
 
     private chains: ChainClient[];
 
-    constructor(pos: PoS) {
+    constructor(
+        pos: PoS,
+        authManager: WorkerAuthManager,
+        gasPriceProvider: GasPriceProvider
+    ) {
+        super(authManager, pos.address);
         this.pos = pos;
+        this.gasPriceProvider = gasPriceProvider;
         this.chains = [];
     }
 
@@ -161,7 +157,11 @@ export class ProtocolImpl implements ProtocolClient {
     getChain(index: number): ChainClient {
         // create chains on demand
         while (index >= this.chains.length) {
-            const chain = new ChainImpl(this.pos, this.chains.length);
+            const chain = new ChainImpl(
+                this.pos,
+                this.gasPriceProvider,
+                this.chains.length
+            );
             this.chains.push(chain);
         }
         return this.chains[index];
