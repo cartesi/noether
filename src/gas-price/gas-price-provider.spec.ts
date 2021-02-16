@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -20,32 +20,38 @@ const provider = new MockProvider();
 describe("gas price provider test suite", () => {
     it("should create gas price provider without gas station", () => {
         gasPriceProviderModule.__with__({
-            gasStationGasPriceProviderEnabled: false,
             // default Ganache chain id is 1337
             gasStationChainId: 1337,
         })(async () => {
-            const gasPriceProvider = await createGasPriceProvider(provider);
+            const gasPriceProvider = await createGasPriceProvider(
+                provider,
+                "eth-provider"
+            );
             expect(gasPriceProvider.chain.length).to.be.eq(1);
         });
     });
 
     it("should create gas price provider with gas station", () => {
         gasPriceProviderModule.__with__({
-            gasStationGasPriceProviderEnabled: true,
             // default Ganache chain id is 1337
             gasStationChainId: 1337,
         })(async () => {
-            const gasPriceProvider = await createGasPriceProvider(provider);
+            const gasPriceProvider = await createGasPriceProvider(
+                provider,
+                "fast"
+            );
             expect(gasPriceProvider.chain.length).to.be.eq(2);
         });
     });
 
     it("should not use gas station when chain id is not GAS_STATION_API_CHAIN_ID", () => {
         gasPriceProviderModule.__with__({
-            gasStationGasPriceProviderEnabled: true,
             gasStationChainId: 1,
         })(async () => {
-            const gasPriceProvider = await createGasPriceProvider(provider);
+            const gasPriceProvider = await createGasPriceProvider(
+                provider,
+                "fast"
+            );
             expect(gasPriceProvider.chain.length).to.be.eq(1);
         });
     });

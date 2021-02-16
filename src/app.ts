@@ -20,7 +20,10 @@ import { hire, retire } from "./worker";
 import { checkVersion } from "./version";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
 import { client1, ProtocolImpl } from "./pos";
-import { createGasPriceProvider } from "./gas-price/gas-price-provider";
+import {
+    createGasPriceProvider,
+    GasPriceProviderType,
+} from "./gas-price/gas-price-provider";
 
 const checkBalance = async (provider: Provider, address: string) => {
     const balance = await provider.getBalance(address);
@@ -35,7 +38,7 @@ export const app = async (
     url: string,
     accountIndex: number,
     wallet: string | undefined,
-    gasPriceProviderType: string,
+    gasPriceProviderType: GasPriceProviderType,
     create: boolean
 ) => {
     // connect to node
@@ -46,9 +49,11 @@ export const app = async (
         create
     );
 
-    // create gas price provider using eth provider
-    // XXX: option to use eth gas station
-    const gasPriceProvider = await createGasPriceProvider(provider);
+    // create gas price provider using specified type
+    const gasPriceProvider = await createGasPriceProvider(
+        provider,
+        gasPriceProviderType
+    );
 
     // worker hiring
     const user = await hire(workerManager, gasPriceProvider, address);
@@ -70,8 +75,8 @@ export const app = async (
     );
 
     // verify authorization
-    const authorized = await blockProducer.authorize();
-    const authorized1 = await blockProducer.authorize();
+    const authorized = await blockProducer.isAuthorized();
+    const authorized1 = await blockProducer1.isAuthorized();
 
     const explorerUrl = "https://explorer.cartesi.io/staking";
     if (!authorized) {
@@ -82,7 +87,7 @@ export const app = async (
     }
     if (!authorized1) {
         log.error(
-            `worker not authorized to interact with PoS(${pos1.address}), please go to ${explorerUrl} and authorize`
+            `worker not authorized to interact with legacy PoS(${pos1.address}), please go to ${explorerUrl} and authorize`
         );
         return;
     }

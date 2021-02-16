@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -14,13 +14,16 @@ import { GasPriceProvider } from "../gas-price-provider";
 import log from "loglevel";
 import axios from "axios";
 
+// profiles according to gas station API at https://docs.ethgasstation.info/gas-price
+export type GasStationProfile = "fast" | "fastest" | "safeLow" | "average";
+
 interface GasStationOptions {
     url: string;
     key?: string;
     timeout: number;
-    profile: string;
+    profile: GasStationProfile;
 }
-type GasStationOptionsReadOnly = Readonly<GasStationOptions>;
+export type GasStationOptionsReadOnly = Readonly<GasStationOptions>;
 export type GasStationGasPriceProviderOptions = Partial<GasStationOptions>;
 
 export default class GasStationGasPriceProvider implements GasPriceProvider {

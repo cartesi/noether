@@ -27,8 +27,8 @@ export class BlockProducer {
         this.client = client;
     }
 
-    async authorize(): Promise<boolean> {
-        return this.client.authorize(this.address);
+    async isAuthorized(): Promise<boolean> {
+        return this.client.isAuthorized();
     }
 
     async produceBlock(user: string) {

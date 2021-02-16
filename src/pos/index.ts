@@ -24,7 +24,7 @@ export interface ChainClient {
 }
 
 export interface ProtocolClient {
-    authorize(address: string): Promise<boolean>;
+    isAuthorized(): Promise<boolean>;
     getNumberOfChains(): Promise<number>;
     getChain(index: number): ChainClient;
 }
@@ -32,15 +32,17 @@ export interface ProtocolClient {
 export abstract class AbstractProtocolClient {
     private authManager: WorkerAuthManager;
 
-    private address: string;
+    private posAddress: string;
 
-    constructor(authManager: WorkerAuthManager, address: string) {
+    constructor(authManager: WorkerAuthManager, posAddress: string) {
         this.authManager = authManager;
-        this.address = address;
+        this.posAddress = posAddress;
     }
 
-    async authorize(address: string): Promise<boolean> {
-        return this.authManager.isAuthorized(address, this.address);
+    async isAuthorized(): Promise<boolean> {
+        const workerAddress = await this.authManager.signer.getAddress();
+        const posAddress = this.posAddress;
+        return this.authManager.isAuthorized(workerAddress, posAddress);
     }
 }
 

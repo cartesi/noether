@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -9,9 +9,25 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { loadWallet } from "./connection";
+import { Argv } from "yargs";
+import { loadWallet } from "../connection";
 
-export const exportWallet = async (walletFile: string) => {
-    const wallet = await loadWallet(walletFile, false);
+interface Args {
+    wallet: string;
+}
+
+export const command = "export";
+export const describe = "Export encrypted wallet file to mnemonic";
+
+export const builder = (yargs: Argv) => {
+    return yargs.option("wallet", {
+        describe: "Filename of JSON wallet file",
+        type: "string",
+        default: "/root/.ethereum/key",
+    });
+};
+
+export const handler = async (args: Args) => {
+    const wallet = await loadWallet(args.wallet, false);
     console.log(`MNEMONIC="${wallet.mnemonic.phrase}"`);
 };

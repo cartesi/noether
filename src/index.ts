@@ -10,70 +10,17 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { app } from "./app";
-import { exportWallet } from "./export";
 import log from "loglevel";
 import chalk from "chalk";
 import prefix from "loglevel-plugin-prefix";
-import yargs, { Argv } from "yargs";
+import yargs from "yargs";
 
 // parse command line
-let argv = yargs
-    .command(
-        ["start", "$0"],
-        "Start the node.",
-        (yargs: Argv) => {
-            return yargs
-                .option("url", {
-                    describe: "URL of the Ethereum node",
-                    default: process.env.URL || "http://localhost:8545",
-                })
-                .option("wallet", {
-                    describe: "Filename of JSON wallet file",
-                    type: "string",
-                })
-                .option("accountIndex", {
-                    describe: "Account index from server to use",
-                    default: 0,
-                })
-                .option("create", {
-                    describe: "Create a wallet if it doesn't exist",
-                    type: "boolean",
-                    alias: "c",
-                    default: false,
-                })
-                .option("verbose", {
-                    type: "boolean",
-                    alias: "v",
-                    default: false,
-                });
-        },
-        (args) =>
-            app(
-                args.url,
-                args.accountIndex,
-                args.wallet,
-                "provider",
-                args.create
-            )
-    )
-    .command(
-        "export",
-        "Export encrypted wallet file to mnemonic",
-        (yargs: Argv) => {
-            return yargs
-                .option("wallet", {
-                    describe: "Filename of JSON wallet file",
-                    type: "string",
-                    default: "/root/.ethereum/key",
-                })
-                .option("verbose", {
-                    type: "boolean",
-                    alias: "v",
-                    default: false,
-                });
-        },
-        (args) => exportWallet(args.wallet)
+const argv = yargs
+    .version()
+    .commandDir("commands", { extensions: ["js", "ts"] })
+    .epilogue(
+        "for more information, find the documentation at https://github.com/cartesi/noether"
     ).argv;
 
 // setup shinny log prefix
