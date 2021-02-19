@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -9,13 +9,15 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { expect } from "chai";
+import chain, { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
 import sinon from "sinon";
 import { GasPriceProvider } from "../gas-price-provider";
 import { BigNumber } from "ethers";
 import ChainGasPriceProvider from "./chain-gas-price-provider";
 import log from "loglevel";
 
+chain.use(chaiAsPromised);
 const sandbox = sinon.createSandbox();
 
 class gasProviderMock implements GasPriceProvider {
@@ -52,5 +54,26 @@ describe("chain gas price provider test suite", () => {
         expect(gasPriceProvider.chain).to.be.eq(gasPriceProviders);
         const gasPrice = await gasPriceProvider.getGasPrice();
         expect(gasPrice.toString()).to.be.eq("2");
+    });
+
+    it("should not provide gas price with no providers", async () => {
+        sandbox.stub(log, "error").returns();
+        const gasPriceProvider = new ChainGasPriceProvider([]);
+        expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
+            "no valid gas price returned from the chain of gas price providers"
+        );
+    });
+
+    it("should not provide gas price with all failing providers", async () => {
+        sandbox.stub(log, "error").returns();
+        const gasPriceProvider1 = new gasProviderMock(BigNumber.from(1), true);
+        const gasPriceProvider2 = new gasProviderMock(BigNumber.from(2), true);
+        const gasPriceProvider = new ChainGasPriceProvider([
+            gasPriceProvider1,
+            gasPriceProvider2,
+        ]);
+        expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
+            "no valid gas price returned from the chain of gas price providers"
+        );
     });
 });

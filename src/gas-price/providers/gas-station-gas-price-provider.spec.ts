@@ -13,7 +13,9 @@ import log from "loglevel";
 import { expect } from "chai";
 import sinon from "sinon";
 import axios from "axios";
-import GasStationGasPriceProvider from "./gas-station-gas-price-provider";
+import GasStationGasPriceProvider, {
+    GasStationProfile,
+} from "./gas-station-gas-price-provider";
 
 const sandbox = sinon.createSandbox();
 
@@ -43,9 +45,12 @@ describe("gas station gas price provider test suite", () => {
     });
 
     it("should reject on missing price", async () => {
+        const profile: GasStationProfile = "fast";
         sandbox.stub(log, "error").returns();
         sandbox.stub(axios, "get").returns(Promise.resolve({ data: {} }));
-        const gasPriceProvider = new GasStationGasPriceProvider();
-        expect(gasPriceProvider.getGasPrice).to.throw;
+        const gasPriceProvider = new GasStationGasPriceProvider({ profile });
+        expect(gasPriceProvider.getGasPrice()).to.eventually.throw(
+            `gas station did not return a ${profile} price`
+        );
     });
 });
