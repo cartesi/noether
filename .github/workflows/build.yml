@@ -5,8 +5,17 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+
+      - run: yarn
+      
       - name: Code format check
-        run: npx prettier --check **/*.ts
+        run: yarn prettier
+
+      - name: Test
+        run: yarn test
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
