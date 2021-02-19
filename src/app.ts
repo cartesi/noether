@@ -74,23 +74,7 @@ export const app = async (
         new client1.ProtocolImpl(pos1, workerManager, gasPriceProvider)
     );
 
-    // verify authorization
-    const authorized = await blockProducer.isAuthorized();
-    const authorized1 = await blockProducer1.isAuthorized();
-
     const explorerUrl = "https://explorer.cartesi.io/staking";
-    if (!authorized) {
-        log.error(
-            `worker not authorized to interact with PoS(${pos.address}), please go to ${explorerUrl} and authorize`
-        );
-        return;
-    }
-    if (!authorized1) {
-        log.error(
-            `worker not authorized to interact with legacy PoS(${pos1.address}), please go to ${explorerUrl} and authorize`
-        );
-        return;
-    }
 
     // loop forever
     while (true) {
@@ -107,8 +91,17 @@ export const app = async (
             await checkBalance(pos.provider, address);
 
             // check and try to produce a block, on both protocols
-            await blockProducer1.produceBlock(user);
-            await blockProducer.produceBlock(user);
+            if (await blockProducer1.isAuthorized()) {
+                await blockProducer1.produceBlock(user);
+            }
+
+            if (await blockProducer.isAuthorized()) {
+                await blockProducer.produceBlock(user);
+            } else {
+                log.error(
+                    `worker not authorized to interact with PoS(${pos.address}), please go to ${explorerUrl} and authorize`
+                );
+            }
         } catch (e) {
             log.error(e);
         }
