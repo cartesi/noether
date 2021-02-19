@@ -41,5 +41,10 @@ prefix.apply(log, {
     timestampFormatter: (date) => date.toISOString(),
 });
 
+// graceful shutdown
+process.on("SIGINT", function () {
+    process.exit();
+});
+
 // set log level according to verbose option, 0 is trace, 2 is info
 log.setLevel(argv.verbose ? 0 : 2);
