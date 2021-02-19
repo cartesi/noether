@@ -84,6 +84,11 @@ class ChainImpl implements ChainClient {
         return rewardManager.getCurrentReward();
     }
 
+    async getRewardManagerAddress(): Promise<string> {
+        const rewardManager = await this.getRewardManager();
+        return rewardManager.address;
+    }
+
     async getStakedBalance(user: string): Promise<BigNumber> {
         const staking = await this.getStaking();
         return staking.getStakedBalance(user);

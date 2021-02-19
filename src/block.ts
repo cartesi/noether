@@ -54,7 +54,10 @@ export class BlockProducer {
 
             const reward = await chain.getCurrentReward();
             if (reward.isZero()) {
-                log.debug(`[${this.address}/${chainId}] zero reward`);
+                const address = await chain.getRewardManagerAddress();
+                log.debug(
+                    `[${this.address}/${chainId}] zero reward at RewardManager(${address})`
+                );
                 return;
             }
 

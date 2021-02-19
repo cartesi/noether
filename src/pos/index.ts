@@ -15,6 +15,7 @@ import { BigNumber, ContractTransaction } from "ethers";
 export interface ChainClient {
     isActive(): Promise<boolean>;
     getCurrentReward(): Promise<BigNumber>;
+    getRewardManagerAddress(): Promise<string>;
     getStakedBalance(user: string): Promise<BigNumber>;
     getMaturingBalance(user: string): Promise<BigNumber>;
     getMaturingTimestamp(user: string): Promise<number>;
