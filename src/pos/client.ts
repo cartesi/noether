@@ -36,10 +36,10 @@ class ChainImpl implements ChainClient {
 
     constructor(pos: PoS, gasPriceProvider: GasPriceProvider, chainId: number) {
         this.pos = pos;
+        this.gasPriceProvider = gasPriceProvider;
         this.chainId = chainId;
         this.rewardManager = undefined;
         this.staking = undefined;
-        this.gasPriceProvider = gasPriceProvider;
     }
 
     private async getRewardManager(): Promise<RewardManager> {
@@ -113,22 +113,12 @@ class ChainImpl implements ChainClient {
         return currentBlock.sub(currentGoalBlockNumber);
     }
 
-    async canProduceBlock(
-        user: string,
-        staked: BigNumber,
-        overrides?: Overrides
-    ): Promise<boolean> {
+    async canProduceBlock(user: string, staked: BigNumber): Promise<boolean> {
         const blockSelector = await this.getBlockSelector();
         const blockSelectorIndex = await this.pos.getBlockSelectorIndex(
-            this.chainId,
-            overrides
+            this.chainId
         );
-        return blockSelector.canProduceBlock(
-            blockSelectorIndex,
-            user,
-            staked,
-            overrides
-        );
+        return blockSelector.canProduceBlock(blockSelectorIndex, user, staked);
     }
 
     async produceBlock(): Promise<ContractTransaction> {
