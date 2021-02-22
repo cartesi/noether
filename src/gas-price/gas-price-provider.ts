@@ -39,10 +39,6 @@ export interface GasPriceProvider {
     getGasPrice(): Promise<BigNumber>;
 }
 
-// create module constants for easy monkey-patching during test
-// TODO: make the config mockable
-const gasStationChainId = GAS_STATION_API_CHAIN_ID;
-
 export const createGasPriceProvider = async (
     provider: Provider,
     type: GasPriceProviderType
@@ -53,7 +49,10 @@ export const createGasPriceProvider = async (
         GAS_PRICE_MULTIPLIER
     );
 
-    if (type !== "eth-provider" && network.chainId === gasStationChainId) {
+    if (
+        type !== "eth-provider" &&
+        network.chainId === GAS_STATION_API_CHAIN_ID
+    ) {
         log.debug(
             `using gas price predictor from eth gas station with "${type}" profile`
         );

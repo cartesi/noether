@@ -15,7 +15,7 @@ import sinon from "sinon";
 import axios from "axios";
 import GasStationGasPriceProvider, {
     GasStationProfile,
-} from "./gas-station-gas-price-provider";
+} from "../../../src/gas-price/providers/gas-station-gas-price-provider";
 
 const sandbox = sinon.createSandbox();
 

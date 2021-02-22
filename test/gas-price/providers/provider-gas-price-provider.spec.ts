@@ -10,10 +10,10 @@
 // specific language governing permissions and limitations under the License.
 
 import { expect } from "chai";
-import { GAS_PRICE_MULTIPLIER } from "../../config";
+import { GAS_PRICE_MULTIPLIER } from "../../../src/config";
 import { BigNumber } from "ethers";
 import { MockProvider } from "@ethereum-waffle/provider";
-import ProviderGasPriceProvider from "./provider-gas-price-provider";
+import ProviderGasPriceProvider from "../../../src/gas-price/providers/provider-gas-price-provider";
 
 describe("provider gas price provider test suite", () => {
     it("should provide gas price", async () => {

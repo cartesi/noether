@@ -12,9 +12,9 @@
 import chain, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import sinon from "sinon";
-import { GasPriceProvider } from "../gas-price-provider";
+import { GasPriceProvider } from "../../../src/gas-price/gas-price-provider";
 import { BigNumber } from "ethers";
-import ChainGasPriceProvider from "./chain-gas-price-provider";
+import ChainGasPriceProvider from "../../../src/gas-price/providers/chain-gas-price-provider";
 import log from "loglevel";
 
 chain.use(chaiAsPromised);

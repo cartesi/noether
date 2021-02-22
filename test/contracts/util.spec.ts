@@ -12,7 +12,7 @@
 import { expect } from "chai";
 import { Network } from "@ethersproject/providers";
 import { Signer, VoidSigner } from "ethers";
-import { createWorkerManager } from "./util";
+import { createWorkerManager } from "../../src/contracts/util";
 
 import mainnet from "@cartesi/util/export/abi/mainnet.json";
 import goerli from "@cartesi/util/export/abi/goerli.json";

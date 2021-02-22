@@ -10,7 +10,7 @@
 // specific language governing permissions and limitations under the License.
 
 import { expect } from "chai";
-import { ChainMap, getAddress } from ".";
+import { ChainMap, getAddress } from "../../src/contracts";
 
 describe("contracts test suite", () => {
     it("should resolve address for existing contract", () => {
