@@ -3,7 +3,7 @@
     "build": "tsc --project tsconfig.prod.json",
     "export": "ts-node src/index.ts export",
     "start": "ts-node src/index.ts start",
-    "test": "nyc mocha",
+    "test": "mocha",
     "prettier": "prettier -w \"**/*.ts\""
   },
   "dependencies": {
