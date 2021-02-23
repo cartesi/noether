@@ -35,7 +35,11 @@ describe("gas price provider test suite", () => {
                 name: "homestead",
             });
 
-        const gasPriceProvider = await createGasPriceProvider(provider, "fast");
+        const gasPriceProvider = await createGasPriceProvider(
+            provider,
+            "fast",
+            "test"
+        );
         expect(gasPriceProvider).to.be.an.instanceof(ChainGasPriceProvider);
         expect(
             (gasPriceProvider as ChainGasPriceProvider).chain.length

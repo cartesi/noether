@@ -67,6 +67,18 @@ Once the application is running you have to check its log using Heroku dashboard
 
 Heroku does not provide a persistent disk storage, so we can't store the encrypted wallet on disk. Instead we use a [random seed](https://devcenter.heroku.com/articles/app-json-schema#env) created by Heroku during deployment, and stored in the application [environment variables](https://devcenter.heroku.com/articles/config-vars). Keep in mind that this is not the safest solution, but once the node is hired it will only work for its owner. The funds in the node should be kept at a level just for block production.
 
+### Additional options
+
+Noether command line provides the following options:
+
+| Option             | Environment variable | Default               | Description                      |
+| ------------------ | -------------------- | --------------------- | -------------------------------- |
+| --url              | URL                  | http://localhost:8545 | URL of the Ethereum node         |
+| --wallet           |                      | _none_                | Filename of JSON wallet file     |
+| --accountIndex     |                      | 0                     | Account index from server to use |
+| --gasPrice         | GAS_PRICE_PROVIDER   | eth-provider          | Gas price predictor strategy     |
+| --gasStationAPIKey | GAS_STATION_API_KEY  |                       |                                  |
+
 ## Goerli public network
 
 Running on [Goerli](https://goerli.net) is very similar to running on `mainnet`, with the following differences:

@@ -38,8 +38,9 @@ export const app = async (
     url: string,
     accountIndex: number,
     wallet: string | undefined,
+    create: boolean,
     gasPriceProviderType: GasPriceProviderType,
-    create: boolean
+    gasStationAPIKey: string | undefined
 ) => {
     // connect to node
     const { address, pos, pos1, provider, workerManager } = await connect(
@@ -52,7 +53,8 @@ export const app = async (
     // create gas price provider using specified type
     const gasPriceProvider = await createGasPriceProvider(
         provider,
-        gasPriceProviderType
+        gasPriceProviderType,
+        gasStationAPIKey
     );
 
     // worker hiring

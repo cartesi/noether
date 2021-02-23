@@ -22,5 +22,4 @@ export const BALANCE_THRESHOLD = parseEther("0.05");
 export const GAS_STATION_API_CHAIN_ID = 1;
 export const GAS_STATION_API_URL =
     "https://ethgasstation.info/json/ethgasAPI.json";
-export const GAS_STATION_API_KEY = undefined;
 export const GAS_STATION_API_REQUEST_TIMEOUT_MS = 10000;

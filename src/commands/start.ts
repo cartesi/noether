@@ -22,6 +22,7 @@ interface Args {
     accountIndex: number;
     create: boolean;
     gasPrice: GasPriceProviderType;
+    gasStationAPIKey: string;
     verbose: boolean;
 }
 
@@ -44,9 +45,13 @@ export const builder = (yargs: Argv) => {
         })
         .option("gasPrice", {
             describe: "Gas price predictor strategy",
-            default: "eth-provider",
+            default: process.env.GAS_PRICE_PROVIDER || "eth-provider",
             demandOption: true,
             choices: gasPriceProviderTypes,
+        })
+        .option("gasStationAPIKey", {
+            describe: "Gas Station API Key",
+            default: process.env.GAS_STATION_API_KEY,
         })
         .option("create", {
             describe: "Create a wallet if it doesn't exist",
@@ -61,5 +66,12 @@ export const builder = (yargs: Argv) => {
         });
 };
 export const handler = (args: Args) => {
-    app(args.url, args.accountIndex, args.wallet, args.gasPrice, args.create);
+    app(
+        args.url,
+        args.accountIndex,
+        args.wallet,
+        args.create,
+        args.gasPrice,
+        args.gasStationAPIKey
+    );
 };

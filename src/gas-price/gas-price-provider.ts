@@ -14,7 +14,6 @@ import { Provider } from "@ethersproject/abstract-provider";
 import {
     GAS_PRICE_MULTIPLIER,
     GAS_STATION_API_CHAIN_ID,
-    GAS_STATION_API_KEY,
     GAS_STATION_API_REQUEST_TIMEOUT_MS,
     GAS_STATION_API_URL,
 } from "../config";
@@ -41,7 +40,8 @@ export interface GasPriceProvider {
 
 export const createGasPriceProvider = async (
     provider: Provider,
-    type: GasPriceProviderType
+    type: GasPriceProviderType,
+    apiKey: string | undefined = undefined
 ): Promise<GasPriceProvider> => {
     const network = await provider.getNetwork();
     const providerGasPriceProvider = new ProviderGasPriceProvider(
@@ -58,7 +58,7 @@ export const createGasPriceProvider = async (
         );
         const gasStationProvider = new GasStationGasPriceProvider({
             url: GAS_STATION_API_URL,
-            key: GAS_STATION_API_KEY,
+            key: apiKey,
             timeout: GAS_STATION_API_REQUEST_TIMEOUT_MS,
             profile: type,
         });
