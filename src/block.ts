@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -17,6 +17,8 @@ import { formatCTSI } from "./util";
 import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "./config";
 import { ProtocolClient } from "./pos";
 
+const explorerUrl = "https://explorer.cartesi.io/staking";
+
 export class BlockProducer {
     private address: string;
 
@@ -27,14 +29,26 @@ export class BlockProducer {
         this.client = client;
     }
 
-    async isAuthorized(): Promise<boolean> {
-        return this.client.isAuthorized();
-    }
-
     async produceBlock(user: string) {
         // number of chains
         const chains = await this.client.getNumberOfChains();
+        const authorized = await this.client.isAuthorized();
 
+        // check authorization
+        if (!authorized) {
+            if (chains == 0) {
+                log.warn(
+                    `[${this.address}] worker not authorized to interact with PoS(${this.address}), please go to ${explorerUrl} and authorize`
+                );
+            } else {
+                log.error(
+                    `[${this.address}] worker not authorized to interact with PoS(${this.address}), please go to ${explorerUrl} and authorize`
+                );
+            }
+            return true;
+        }
+
+        // if there are no chains, exit
         if (chains == 0) {
             log.debug(`[${this.address}] no chains`);
             return true;
@@ -49,7 +63,7 @@ export class BlockProducer {
                 if (chainId > 0) {
                     log.debug(`[${this.address}/${chainId}] inactive`);
                 }
-                return;
+                continue;
             }
 
             const reward = await chain.getCurrentReward();
@@ -58,7 +72,7 @@ export class BlockProducer {
                 log.debug(
                     `[${this.address}/${chainId}] zero reward at RewardManager(${address})`
                 );
-                return;
+                continue;
             }
 
             // check stake state
@@ -106,7 +120,7 @@ export class BlockProducer {
 
             if (staked.isZero()) {
                 // zero mature, bail out
-                return;
+                continue;
             }
 
             // check if can produce
@@ -122,7 +136,7 @@ export class BlockProducer {
                         blockInterval.mod(256).eq(0) ||
                         blockInterval.mod(256).gte(254)
                     ) {
-                        return;
+                        continue;
                     }
 
                     log.info(
