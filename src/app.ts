@@ -79,9 +79,6 @@ export const app = async (
     // loop forever
     while (true) {
         try {
-            // check software version
-            await checkVersion();
-
             // check if node retired
             if (await retire(workerManager, address)) {
                 break;
