@@ -128,27 +128,27 @@ export class BlockProducer {
                     log.info(
                         `[${
                             this.address
-                        }/${chainId}] trying to produce block and claim reward of ${formatCTSI(
+                        }/${chainId}] ⛏ trying to produce block and claim reward of ${formatCTSI(
                             reward
                         )} CTSI...`
                     );
 
                     const tx = await chain.produceBlock();
                     log.info(
-                        `[${this.address}/${chainId}] transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+                        `[${this.address}/${chainId}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
                     );
 
                     // wait for confirmation, with a timeout
                     const receipt = await pTimeout(
                         tx.wait(CONFIRMATIONS),
                         CONFIRMATION_TIMEOUT,
-                        `timeout waiting ${humanizeDuration(
+                        `⏰ timeout waiting ${humanizeDuration(
                             CONFIRMATION_TIMEOUT
                         )} for confirmation`
                     );
 
                     log.info(
-                        `[${this.address}/${chainId}] block produced, gas used ${receipt.gasUsed}`
+                        `[${this.address}/${chainId}] 🎉 block produced, gas used ${receipt.gasUsed}`
                     );
                 } catch (e) {
                     log.error(e.message);
