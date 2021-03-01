@@ -74,10 +74,32 @@ Noether command line provides the following options:
 | Option             | Environment variable | Default               | Description                      |
 | ------------------ | -------------------- | --------------------- | -------------------------------- |
 | --url              | URL                  | http://localhost:8545 | URL of the Ethereum node         |
-| --wallet           |                      | _none_                | Filename of JSON wallet file     |
+| --wallet           |                      |                       | Filename of JSON wallet file     |
 | --accountIndex     |                      | 0                     | Account index from server to use |
 | --gasPrice         | GAS_PRICE_PROVIDER   | eth-provider          | Gas price predictor strategy     |
 | --gasStationAPIKey | GAS_STATION_API_KEY  |                       |                                  |
+
+### Gas price
+
+Every transaction sent by the node needs to predict the gas price.
+The higher the gas price, the faster the transaction will be mined by the ethereum blockchain.
+But it will cost more.
+
+By default the node uses the gas price provided by the ethereum provider used by the node (`eth-provider`), by making a call to [eth_gasPrice](https://eth.wiki/json-rpc/API#eth_gasprice). This may not be the best gas price prediction, so we provide another option, which is to call the [ETH Gas Station API](https://docs.ethgasstation.info).
+
+The API is provided for free (up to a limit), but requires signup to request an API key. Refer to [their documentation](https://docs.ethgasstation.info) on how to signup. Once you get an API key you can restart your node with the following options:
+
+```
+--gasPrice <fast | fastest | safeLow | average> --gasStationAPIKey <apiKey>
+
+where:
+fastest: expected to be mined in < 30 seconds
+fast: expected to be mined in < 2 minutes
+average: expected to be mined in < 5 minutes
+safeLow: expected to be mined in < 30 minutes
+```
+
+If you are using Heroku you can use the environment variables `GAS_PRICE_PROVIDER` and `GAS_STATION_API_KEY` for the same effect.
 
 ## Goerli public network
 
