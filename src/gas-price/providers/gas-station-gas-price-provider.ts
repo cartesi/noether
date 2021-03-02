@@ -42,7 +42,7 @@ export default class GasStationGasPriceProvider implements GasPriceProvider {
         try {
             const gasStationPrice = await this.requestGasStationPrice();
             const gasPrice = this.gasStationPriceToBigNumber(gasStationPrice);
-            log.info("gas station: fetched gas price", {
+            log.debug("gas station: fetched gas price", {
                 gasPrice: gasPrice.toString(),
             });
             return gasPrice;
