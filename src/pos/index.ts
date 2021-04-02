@@ -48,4 +48,3 @@ export abstract class AbstractProtocolClient {
 }
 
 export * from "./client";
-export * as client1 from "./client1";

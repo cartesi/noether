@@ -19,7 +19,7 @@ import { BlockProducer } from "./block";
 import { hire, retire } from "./worker";
 import { checkVersion } from "./version";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
-import { client1, ProtocolImpl } from "./pos";
+import { ProtocolImpl } from "./pos";
 import {
     createGasPriceProvider,
     GasPriceProviderType,
@@ -43,7 +43,7 @@ export const app = async (
     gasStationAPIKey: string | undefined
 ) => {
     // connect to node
-    const { address, pos, pos1, provider, workerManager } = await connect(
+    const { address, pos, provider, workerManager } = await connect(
         url,
         accountIndex,
         wallet,
@@ -71,10 +71,6 @@ export const app = async (
         pos.address,
         new ProtocolImpl(pos, workerManager, gasPriceProvider)
     );
-    const blockProducer1 = new BlockProducer(
-        pos1.address,
-        new client1.ProtocolImpl(pos1, workerManager, gasPriceProvider)
-    );
 
     // loop forever
     while (true) {
@@ -88,7 +84,6 @@ export const app = async (
             await checkBalance(pos.provider, address);
 
             // try to produce a block, on both protocols
-            await blockProducer1.produceBlock(user);
             await blockProducer.produceBlock(user);
         } catch (e) {
             log.error(e);
