@@ -15,10 +15,7 @@ import { HDNode } from "@ethersproject/hdnode";
 import log from "loglevel";
 import prompts from "prompts";
 
-export const create = async (filename: string): Promise<Wallet> => {
-    // create new wallet
-    const wallet = Wallet.createRandom();
-
+export const save = async (wallet: Wallet, filename: string) => {
     // create encrypted structured
     const password = await prompts({
         type: "password",
@@ -42,6 +39,14 @@ export const create = async (filename: string): Promise<Wallet> => {
     // save key V3
     log.info(`saving encrypted wallet to ${filename}`);
     fs.writeFileSync(filename, json);
+};
+
+export const create = async (filename: string): Promise<Wallet> => {
+    // create new wallet
+    const wallet = Wallet.createRandom();
+
+    // save to file
+    await save(wallet, filename);
 
     return wallet;
 };

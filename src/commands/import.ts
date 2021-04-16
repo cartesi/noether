@@ -17,8 +17,8 @@ interface Args {
     wallet: string;
 }
 
-export const command = "export";
-export const describe = "Export encrypted wallet file to mnemonic";
+export const command = "import";
+export const describe = "Import encrypted wallet file from mnemonic";
 
 export const builder = (yargs: Argv) => {
     return yargs.option("wallet", {
@@ -29,10 +29,22 @@ export const builder = (yargs: Argv) => {
 };
 
 export const handler = async (args: Args) => {
-    const w = await wallet.loadFromFile(args.wallet, false);
-    if (w.mnemonic) {
-        console.log(`MNEMONIC="${w.mnemonic.phrase}"`);
+    if (process.env.MNEMONIC) {
+        // create wallet from mnemonic
+        const w = await wallet.loadFromMnemonic(
+            process.env.MNEMONIC,
+            process.env.MNEMONIC_PATH
+        );
+
+        // create wallet encrypted file
+        await wallet.save(w, args.wallet);
+    } else if (process.env.SEED) {
+        // create wallet from seed
+        const w = await wallet.loadFromSeed(process.env.SEED);
+
+        // create wallet encrypted file
+        await wallet.save(w, args.wallet);
     } else {
-        log.error(`MNEMONIC cannot be extracted from wallet`);
+        log.error(`environment variable MNEMONIC or SEED not set`);
     }
 };
