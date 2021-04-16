@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Abort during startup if connection to ethereum gateway fails
+- Fix late log level initialization
+
+### Added
+
 ## [1.1.0] - 2021-03-01
 
 ### Added

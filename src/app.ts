@@ -86,6 +86,7 @@ export const app = async (
             // try to produce a block, on both protocols
             await blockProducer.produceBlock(user);
         } catch (e) {
+            // print the error, but continue polling
             log.error(e);
         }
 

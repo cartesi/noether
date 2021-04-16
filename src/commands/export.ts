@@ -10,7 +10,7 @@
 // specific language governing permissions and limitations under the License.
 
 import { Argv } from "yargs";
-import { loadWallet } from "../connection";
+import * as wallet from "../wallet";
 
 interface Args {
     wallet: string;
@@ -28,6 +28,6 @@ export const builder = (yargs: Argv) => {
 };
 
 export const handler = async (args: Args) => {
-    const wallet = await loadWallet(args.wallet, false);
-    console.log(`MNEMONIC="${wallet.mnemonic.phrase}"`);
+    const w = await wallet.loadFromFile(args.wallet, false);
+    console.log(`MNEMONIC="${w.mnemonic.phrase}"`);
 };
