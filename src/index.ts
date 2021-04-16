@@ -15,14 +15,6 @@ import chalk from "chalk";
 import prefix from "loglevel-plugin-prefix";
 import yargs from "yargs";
 
-// parse command line
-const argv = yargs
-    .version()
-    .commandDir("commands", { extensions: ["js", "ts"] })
-    .epilogue(
-        "for more information, find the documentation at https://github.com/cartesi/noether"
-    ).argv;
-
 // setup shinny log prefix
 prefix.reg(log);
 interface ColorMapping {
@@ -46,5 +38,11 @@ process.on("SIGINT", function () {
     process.exit();
 });
 
-// set log level according to verbose option, 0 is trace, 2 is info
-log.setLevel(argv.verbose ? 0 : 2);
+// parse command line
+const argv = yargs
+    .version()
+    .middleware([(argv) => log.setLevel(argv.verbose ? 0 : 2)])
+    .commandDir("commands", { extensions: ["js", "ts"] })
+    .epilogue(
+        "for more information, find the documentation at https://github.com/cartesi/noether"
+    ).argv;
