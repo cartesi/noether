@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2021-05-03
+
 ### Changed
 
+- Stop block production at deprecated protocol
 - Abort during startup if connection to ethereum gateway fails
 - Fix late log level initialization
 
@@ -59,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release
 
-[unreleased]: https://github.com/cartesi/noether/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/cartesi/noether/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/cartesi/noether/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/cartesi/noether/compare/v1.0.4...v1.1.0
 [1.0.4]: https://github.com/cartesi/noether/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/cartesi/noether/compare/v1.0.2...v1.0.3
