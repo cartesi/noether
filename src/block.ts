@@ -171,4 +171,12 @@ export class BlockProducer {
         }
         return true;
     }
+
+    async cycle() {
+        const chains = await this.client.getNumberOfChains();
+        for (let i = 0; i < chains; i++) {
+            const chain = this.client.getChain(i);
+            await chain.cycle();
+        }
+    }
 }

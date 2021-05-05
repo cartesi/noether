@@ -1,4 +1,4 @@
-// Copyright 2020 Cartesi Pte. Ltd.
+// Copyright 2021 Cartesi Pte. Ltd.
 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -16,10 +16,9 @@ import { formatEther } from "@ethersproject/units";
 import { sleep } from "./util";
 import { connect } from "./connection";
 import { BlockProducer } from "./block";
-import { hire, retire } from "./worker";
-import { checkVersion } from "./version";
+import { hire, retire, isPool } from "./worker";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
-import { ProtocolImpl } from "./pos";
+import { ProtocolClient, ProtocolImpl } from "./pos";
 import {
     createGasPriceProvider,
     GasPriceProviderType,
@@ -64,13 +63,25 @@ export const app = async (
         log.error(`failed to hire`);
         return;
     }
-    log.info(`worker hired by ${user}`);
 
-    // create block producer for both protocols
-    const blockProducer = new BlockProducer(
-        pos.address,
-        new ProtocolImpl(pos, workerManager, gasPriceProvider)
+    // check if represented user is a pool
+    const pool = await isPool(workerManager, user);
+    if (pool) {
+        log.info(`worker hired by pool ${user}`);
+    } else {
+        log.info(`worker hired by user ${user}`);
+    }
+
+    // create protocol client (smart contract communication)
+    const client: ProtocolClient = new ProtocolImpl(
+        pos,
+        pool ? user : undefined,
+        workerManager,
+        gasPriceProvider
     );
+
+    // create block producer
+    const blockProducer = new BlockProducer(pos.address, client);
 
     // loop forever
     while (true) {
@@ -83,8 +94,11 @@ export const app = async (
             // check node balance
             await checkBalance(pos.provider, address);
 
-            // try to produce a block, on both protocols
+            // try to produce a block
             await blockProducer.produceBlock(user);
+
+            // maintenance calls
+            await blockProducer.cycle();
         } catch (e) {
             // print the error, but continue polling
             log.error(e);

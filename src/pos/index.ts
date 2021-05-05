@@ -22,6 +22,7 @@ export interface ChainClient {
     getBlockInterval(user: string): Promise<BigNumber>;
     canProduceBlock(user: string, staked: BigNumber): Promise<boolean>;
     produceBlock(): Promise<ContractTransaction>;
+    cycle(): Promise<boolean>;
 }
 
 export interface ProtocolClient {

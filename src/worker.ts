@@ -69,6 +69,21 @@ const _hire = async (
     return undefined;
 };
 
+/**
+ * Checks if the address is from a normal user or from a pool.
+ * The pool needs to hire itself and authorized the PoS to called from the pool.
+ * @param workerManager WorkerManager contract
+ * @param userOrPool address of user, which might also be a pool
+ * @returns true if address is from a pool
+ */
+export const isPool = async (
+    workerManager: WorkerManager,
+    userOrPool: string
+): Promise<boolean> => {
+    const owner = await workerManager.getOwner(userOrPool);
+    return owner === userOrPool;
+};
+
 export const retire = async (
     workerManager: WorkerManager,
     address: string

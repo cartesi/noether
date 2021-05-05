@@ -9,7 +9,13 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { BlockSelector, PoS, RewardManager, Staking } from "@cartesi/pos";
+import {
+    BlockSelector,
+    PoS,
+    RewardManager,
+    Staking,
+    StakingPool,
+} from "@cartesi/pos-private";
 import { WorkerAuthManager } from "@cartesi/util";
 import { BigNumber, Overrides, ContractTransaction } from "ethers";
 import { ChainClient, AbstractProtocolClient } from ".";
@@ -18,13 +24,14 @@ import {
     createBlockSelector,
     createRewardManager,
     createStaking,
+    createStakingPool,
 } from "../contracts";
 import { GasPriceProvider } from "../gas-price/gas-price-provider";
 
 class ChainImpl implements ChainClient {
-    private pos: PoS;
+    protected pos: PoS;
 
-    private chainId: number;
+    protected chainId: number;
 
     private rewardManager: RewardManager | undefined;
 
@@ -32,7 +39,7 @@ class ChainImpl implements ChainClient {
 
     private blockSelector: BlockSelector | undefined;
 
-    private gasPriceProvider: GasPriceProvider;
+    protected gasPriceProvider: GasPriceProvider;
 
     constructor(pos: PoS, gasPriceProvider: GasPriceProvider, chainId: number) {
         this.pos = pos;
@@ -140,8 +147,50 @@ class ChainImpl implements ChainClient {
     }
 }
 
+class PoolChainImpl extends ChainImpl {
+    private address: string;
+
+    private stakingPool: StakingPool | undefined;
+
+    constructor(
+        pos: PoS,
+        gasPriceProvider: GasPriceProvider,
+        chainId: number,
+        pool: string
+    ) {
+        super(pos, gasPriceProvider, chainId);
+        this.address = pool;
+    }
+
+    private async getStakingPool(): Promise<StakingPool> {
+        if (!this.stakingPool) {
+            this.stakingPool = await createStakingPool(
+                this.address,
+                this.pos.signer
+            );
+        }
+        return this.stakingPool;
+    }
+
+    async produceBlock(): Promise<ContractTransaction> {
+        const nonce = this.pos.signer.getTransactionCount("latest");
+        const gasPrice = await this.gasPriceProvider.getGasPrice();
+        const pool = await this.getStakingPool();
+        const gasLimit = await pool.estimateGas.produceBlock(this.chainId);
+        const overrides: Overrides = {
+            nonce,
+            gasPrice,
+            gasLimit: gasLimit.mul(GAS_LIMIT_MULTIPLIER).div(100),
+        };
+
+        return pool.produceBlock(this.chainId, overrides);
+    }
+}
+
 export class ProtocolImpl extends AbstractProtocolClient {
     private pos: PoS;
+
+    private pool: string | undefined;
 
     private gasPriceProvider: GasPriceProvider;
 
@@ -149,11 +198,13 @@ export class ProtocolImpl extends AbstractProtocolClient {
 
     constructor(
         pos: PoS,
+        pool: string | undefined,
         authManager: WorkerAuthManager,
         gasPriceProvider: GasPriceProvider
     ) {
         super(authManager, pos.address);
         this.pos = pos;
+        this.pool = pool;
         this.gasPriceProvider = gasPriceProvider;
         this.chains = [];
     }
@@ -166,11 +217,18 @@ export class ProtocolImpl extends AbstractProtocolClient {
     getChain(index: number): ChainClient {
         // create chains on demand
         while (index >= this.chains.length) {
-            const chain = new ChainImpl(
-                this.pos,
-                this.gasPriceProvider,
-                this.chains.length
-            );
+            const chain: ChainClient = this.pool
+                ? new PoolChainImpl(
+                      this.pos,
+                      this.gasPriceProvider,
+                      this.chains.length,
+                      this.pool
+                  )
+                : new ChainImpl(
+                      this.pos,
+                      this.gasPriceProvider,
+                      this.chains.length
+                  );
             this.chains.push(chain);
         }
         return this.chains[index];
