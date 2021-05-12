@@ -9,6 +9,11 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+import log from "loglevel";
+import humanizeDuration from "humanize-duration";
+import pTimeout from "p-timeout";
+import { formatCTSI } from "../util";
+import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "../config";
 import {
     BlockSelector,
     PoS,
@@ -145,6 +150,11 @@ class ChainImpl implements ChainClient {
 
         return this.pos.produceBlock(this.chainId, overrides);
     }
+
+    async cycle(): Promise<boolean> {
+        // nothing to do, unless its a pool
+        return false;
+    }
 }
 
 class PoolChainImpl extends ChainImpl {
@@ -184,6 +194,53 @@ class PoolChainImpl extends ChainImpl {
         };
 
         return pool.produceBlock(this.chainId, overrides);
+    }
+
+    async cycle(): Promise<boolean> {
+        const pool = await this.getStakingPool();
+
+        // check if we need to cycle stake maturation
+        const [
+            needsCycleStakeMaturation,
+            currentStakedQueuedTotal,
+        ] = await pool.needCycleStakeMaturation();
+        if (needsCycleStakeMaturation) {
+            log.info(
+                `[${
+                    pool.address
+                }] cycling stake maturation, queue has ${formatCTSI(
+                    currentStakedQueuedTotal
+                )} CTSI`
+            );
+            const tx = await pool.cycleStakeMaturation();
+            log.info(
+                `[${pool.address}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+            );
+            // wait for confirmation, with a timeout
+            const receipt = await pTimeout(
+                tx.wait(CONFIRMATIONS),
+                CONFIRMATION_TIMEOUT,
+                `⏰ timeout waiting ${humanizeDuration(
+                    CONFIRMATION_TIMEOUT
+                )} for confirmation`
+            );
+
+            log.info(
+                `[${pool.address}}] 🎉 maturation cycled, gas used ${receipt.gasUsed}`
+            );
+        }
+
+        // check if we need to cycle withdraw maturation
+        /*
+        const [
+            needsCycleWithdrawRelease,
+            currentWithdrawQueuedTotal,
+        ] = await pool.needCycleWithdrawRelease();
+        if (needsCycleWithdrawRelease) {
+            await pool.cycleWithdrawRelease();
+        }*/
+
+        return true;
     }
 }
 
