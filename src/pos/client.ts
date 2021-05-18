@@ -200,16 +200,14 @@ class PoolChainImpl extends ChainImpl {
         const pool = await this.getStakingPool();
 
         // check if we need to cycle stake maturation
-        const [
-            needsCycleStakeMaturation,
-            currentStakedQueuedTotal,
-        ] = await pool.needCycleStakeMaturation();
-        if (needsCycleStakeMaturation) {
+        const [needsCycleStakeMaturation, currentQueuedTotal] =
+            await pool.canCycleStakeMaturation();
+        if (needsCycleStakeMaturation && currentQueuedTotal.gt(0)) {
             log.info(
                 `[${
                     pool.address
                 }] cycling stake maturation, queue has ${formatCTSI(
-                    currentStakedQueuedTotal
+                    currentQueuedTotal
                 )} CTSI`
             );
             const tx = await pool.cycleStakeMaturation();
@@ -230,15 +228,34 @@ class PoolChainImpl extends ChainImpl {
             );
         }
 
-        // check if we need to cycle withdraw maturation
-        /*
-        const [
-            needsCycleWithdrawRelease,
-            currentWithdrawQueuedTotal,
-        ] = await pool.needCycleWithdrawRelease();
-        if (needsCycleWithdrawRelease) {
-            await pool.cycleWithdrawRelease();
-        }*/
+        // check if we need to cycle withdraw release
+        const [canCycleWithdrawRelease, currentWithdrawQueuedTotal] =
+            await pool.canCycleWithdrawRelease();
+        if (canCycleWithdrawRelease && currentWithdrawQueuedTotal.gt(0)) {
+            log.info(
+                `[${
+                    pool.address
+                }] cycling withdraw release, queue has ${formatCTSI(
+                    currentWithdrawQueuedTotal
+                )} CTSI`
+            );
+            const tx = await pool.cycleWithdrawRelease();
+            log.info(
+                `[${pool.address}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+            );
+            // wait for confirmation, with a timeout
+            const receipt = await pTimeout(
+                tx.wait(CONFIRMATIONS),
+                CONFIRMATION_TIMEOUT,
+                `⏰ timeout waiting ${humanizeDuration(
+                    CONFIRMATION_TIMEOUT
+                )} for confirmation`
+            );
+
+            log.info(
+                `[${pool.address}}] 🎉 withdraw cycled, gas used ${receipt.gasUsed}`
+            );
+        }
 
         return true;
     }

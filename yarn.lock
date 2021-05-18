@@ -193,16 +193,16 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
-"@cartesi/pos-private@^2.0.0-alpha.4":
-  version "2.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/@cartesi/pos-private/-/pos-private-2.0.0-alpha.4.tgz#e3ba4b2066079bf9a28c03427e4566186de433cc"
-  integrity sha512-J9GTiwJTW3vS30tKabu8fkRTiwUiLpuWjPqYjdag2BjX34UssmPRbcvONcQoflKTedrWfM8X9aZrOhn3t/BBMA==
+"@cartesi/pos-private@^2.0.0-alpha.10":
+  version "2.0.0-alpha.10"
+  resolved "https://registry.yarnpkg.com/@cartesi/pos-private/-/pos-private-2.0.0-alpha.10.tgz#5b25eee69c85b3ffc47b069564e99da6f39a8064"
+  integrity sha512-Ck6Ib9GkOhgn7BWE18KXJD3RXaSu6/Lmw/mw8Wk7kubfmkCVfJlb0wKD47/g0nUVC0tLDIg7YeN4gdtkX2gzFg==
   dependencies:
     "@cartesi/token" "^1.2.5"
     "@cartesi/util" "^1.0.0"
     "@cartesi/util-0.8" "npm:@cartesi/util@3.0.0"
     "@chainlink/contracts" "^0.1.7"
-    "@ensdomains/ens" "^0.6.0"
+    "@ensdomains/ens-contracts" "^0.0.2"
     "@openzeppelin/contracts" "3.2.1-solc-0.7"
     "@openzeppelin/contracts-0.8" "npm:@openzeppelin/contracts@4.1.0"
     "@uniswap/v2-core" "^1.0.1"
@@ -237,6 +237,19 @@
     "@truffle/contract" "^4.3.8"
     ethers "^4.0.45"
 
+"@ensdomains/buffer@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@ensdomains/buffer/-/buffer-0.0.10.tgz#3b9f8b6a34c6160ae8a8cb8f0f033aa35c1a9970"
+  integrity sha512-EOFqiWnN36EyyBAgHFTsabFcFICUALt41SiDm/4pAw4V36R4lD4wHcnZcqCYki9m1fMaeWGHrdqxmrMa8iiSTQ==
+
+"@ensdomains/ens-contracts@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@ensdomains/ens-contracts/-/ens-contracts-0.0.2.tgz#182ce5180a417760d6489fa32be64804ee117a55"
+  integrity sha512-JrW5W0LR0KS/ipfvVW/JIRCgLMfI1RYbFURLbDXXznVOSpUPG0kVRV7+jqVWSby26s5osWm6OYxrosEyTOSGew==
+  dependencies:
+    "@ensdomains/buffer" "^0.0.10"
+    "@openzeppelin/contracts" "^4.1.0"
+
 "@ensdomains/ens@^0.4.4":
   version "0.4.5"
   resolved "https://registry.yarnpkg.com/@ensdomains/ens/-/ens-0.4.5.tgz#e0aebc005afdc066447c6e22feb4eda89a5edbfc"
@@ -247,16 +260,6 @@
     solc "^0.4.20"
     testrpc "0.0.1"
     web3-utils "^1.0.0-beta.31"
-
-"@ensdomains/ens@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@ensdomains/ens/-/ens-0.6.0.tgz#2453d710e951f6f63b40aab7dec38efb5351fb84"
-  integrity sha512-eeRPEPtKGNySPsObrAc3+Xxgw+vSl9C6zUptlxIMi7TlPXYS11Zqd7g3PnHzxvMieWj6dztbH07UdDo/zCqMqQ==
-  dependencies:
-    bluebird "^3.5.2"
-    eth-ens-namehash "^2.0.8"
-    solc "^0.4.20"
-    testrpc "0.0.1"
 
 "@ensdomains/resolver@^0.2.4":
   version "0.2.4"
@@ -674,7 +677,7 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@openzeppelin/contracts-0.8@npm:@openzeppelin/contracts@4.1.0":
+"@openzeppelin/contracts-0.8@npm:@openzeppelin/contracts@4.1.0", "@openzeppelin/contracts@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.1.0.tgz#baec89a7f5f73e3d8ea582a78f1980134b605375"
   integrity sha512-TihZitscnaHNcZgXGj9zDLDyCqjziytB4tMCwXq0XimfWkAjBYyk5/pOsDbbwcavhlc79HhpTEpQcrMnPVa1mw==
