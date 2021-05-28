@@ -193,10 +193,10 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
-"@cartesi/pos-private@^2.0.0-alpha.10":
-  version "2.0.0-alpha.10"
-  resolved "https://registry.yarnpkg.com/@cartesi/pos-private/-/pos-private-2.0.0-alpha.10.tgz#5b25eee69c85b3ffc47b069564e99da6f39a8064"
-  integrity sha512-Ck6Ib9GkOhgn7BWE18KXJD3RXaSu6/Lmw/mw8Wk7kubfmkCVfJlb0wKD47/g0nUVC0tLDIg7YeN4gdtkX2gzFg==
+"@cartesi/pos-private@^2.0.0-alpha.11":
+  version "2.0.0-alpha.11"
+  resolved "https://registry.yarnpkg.com/@cartesi/pos-private/-/pos-private-2.0.0-alpha.11.tgz#6922414867565b1c242399befea9fdb01b71a048"
+  integrity sha512-/CaXVki0XhRsJCAS9KbIa2YjAgfvBLK6eX6VOxeUx5lGDAF9B+JzHVj7lS6uUCbMdcIujqRy5xcCllRbObflDw==
   dependencies:
     "@cartesi/token" "^1.2.5"
     "@cartesi/util" "^1.0.0"
@@ -678,6 +678,7 @@
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
 "@openzeppelin/contracts-0.8@npm:@openzeppelin/contracts@4.1.0", "@openzeppelin/contracts@^4.1.0":
+  name "@openzeppelin/contracts-0.8"
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.1.0.tgz#baec89a7f5f73e3d8ea582a78f1980134b605375"
   integrity sha512-TihZitscnaHNcZgXGj9zDLDyCqjziytB4tMCwXq0XimfWkAjBYyk5/pOsDbbwcavhlc79HhpTEpQcrMnPVa1mw==

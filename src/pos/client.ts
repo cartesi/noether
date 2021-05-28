@@ -200,9 +200,15 @@ class PoolChainImpl extends ChainImpl {
         const pool = await this.getStakingPool();
 
         // check if we need to cycle stake maturation
-        const [needsCycleStakeMaturation, currentQueuedTotal] =
-            await pool.canCycleStakeMaturation();
-        if (needsCycleStakeMaturation && currentQueuedTotal.gt(0)) {
+        const [
+            canCycleStakeMaturation,
+            currentQueuedTotal,
+            currentMaturingTotal,
+        ] = await pool.canCycleStakeMaturation();
+        if (
+            canCycleStakeMaturation &&
+            (currentQueuedTotal.gt(0) || currentMaturingTotal.gt(0))
+        ) {
             log.info(
                 `[${
                     pool.address
@@ -229,9 +235,16 @@ class PoolChainImpl extends ChainImpl {
         }
 
         // check if we need to cycle withdraw release
-        const [canCycleWithdrawRelease, currentWithdrawQueuedTotal] =
-            await pool.canCycleWithdrawRelease();
-        if (canCycleWithdrawRelease && currentWithdrawQueuedTotal.gt(0)) {
+        const [
+            canCycleWithdrawRelease,
+            currentWithdrawQueuedTotal,
+            currentWithdrawMaturingTotal,
+        ] = await pool.canCycleWithdrawRelease();
+        if (
+            canCycleWithdrawRelease &&
+            (currentWithdrawQueuedTotal.gt(0) ||
+                currentWithdrawMaturingTotal.gt(0))
+        ) {
             log.info(
                 `[${
                     pool.address

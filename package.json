@@ -8,7 +8,7 @@
         "test": "mocha"
     },
     "dependencies": {
-        "@cartesi/pos-private": "^2.0.0-alpha.10",
+        "@cartesi/pos-private": "^2.0.0-alpha.11",
         "@cartesi/util": "^1.0.0",
         "axios": "^0.21.1",
         "chalk": "^4.1.1",
