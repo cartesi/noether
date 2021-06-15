@@ -214,11 +214,11 @@ class PoolChainImpl extends ChainImpl {
                     pool.address
                 }] cycling stake maturation, queue has ${formatCTSI(
                     currentQueuedTotal
-                )} CTSI`
+                )} CTSI, maturing ${formatCTSI(currentMaturingTotal)}`
             );
             const tx = await pool.cycleStakeMaturation();
             log.info(
-                `[${pool.address}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+                `[${pool.address}] ⏱ transaction ${tx.hash} with price ${tx.gasPrice}, waiting for ${CONFIRMATIONS} confirmation(s)...`
             );
             // wait for confirmation, with a timeout
             const receipt = await pTimeout(
@@ -250,11 +250,11 @@ class PoolChainImpl extends ChainImpl {
                     pool.address
                 }] cycling withdraw release, queue has ${formatCTSI(
                     currentWithdrawQueuedTotal
-                )} CTSI`
+                )} CTSI, maturing ${formatCTSI(currentWithdrawMaturingTotal)}`
             );
             const tx = await pool.cycleWithdrawRelease();
             log.info(
-                `[${pool.address}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+                `[${pool.address}] ⏱ transaction ${tx.hash} with price ${tx.gasPrice}, waiting for ${CONFIRMATIONS} confirmation(s)...`
             );
             // wait for confirmation, with a timeout
             const receipt = await pTimeout(
