@@ -9,6 +9,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+import { PoS } from "@cartesi/pos-private";
 import { WorkerAuthManager } from "@cartesi/util";
 import { BigNumber, ContractTransaction } from "ethers";
 
@@ -22,30 +23,37 @@ export interface ChainClient {
     getBlockInterval(user: string): Promise<BigNumber>;
     canProduceBlock(user: string, staked: BigNumber): Promise<boolean>;
     produceBlock(): Promise<ContractTransaction>;
-    cycle(): Promise<boolean>;
 }
 
 export interface ProtocolClient {
     isAuthorized(): Promise<boolean>;
     getNumberOfChains(): Promise<number>;
     getChain(index: number): ChainClient;
+    cycle(): Promise<boolean>;
 }
 
-export abstract class AbstractProtocolClient {
+export abstract class AbstractProtocolClient implements ProtocolClient {
     private authManager: WorkerAuthManager;
 
-    private posAddress: string;
+    protected pos: PoS;
 
-    constructor(authManager: WorkerAuthManager, posAddress: string) {
+    constructor(pos: PoS, authManager: WorkerAuthManager) {
+        this.pos = pos;
         this.authManager = authManager;
-        this.posAddress = posAddress;
     }
 
     async isAuthorized(): Promise<boolean> {
         const workerAddress = await this.authManager.signer.getAddress();
-        const posAddress = this.posAddress;
-        return this.authManager.isAuthorized(workerAddress, posAddress);
+        return this.authManager.isAuthorized(workerAddress, this.pos.address);
     }
+
+    async getNumberOfChains(): Promise<number> {
+        const i = await this.pos.currentIndex();
+        return i.toNumber();
+    }
+
+    abstract getChain(index: number): ChainClient;
+    abstract cycle(): Promise<boolean>;
 }
 
 export * from "./client";

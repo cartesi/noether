@@ -18,7 +18,7 @@ import { connect } from "./connection";
 import { BlockProducer } from "./block";
 import { hire, retire, isPool } from "./worker";
 import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
-import { ProtocolClient, ProtocolImpl } from "./pos";
+import { PoolProtocolImpl, ProtocolClient, ProtocolImpl } from "./pos";
 import {
     createGasPriceProvider,
     GasPriceProviderType,
@@ -73,12 +73,9 @@ export const app = async (
     }
 
     // create protocol client (smart contract communication)
-    const client: ProtocolClient = new ProtocolImpl(
-        pos,
-        pool ? user : undefined,
-        workerManager,
-        gasPriceProvider
-    );
+    const client: ProtocolClient = pool
+        ? new PoolProtocolImpl(pos, user, workerManager, gasPriceProvider)
+        : new ProtocolImpl(pos, workerManager, gasPriceProvider);
 
     // create block producer
     const blockProducer = new BlockProducer(pos.address, client);

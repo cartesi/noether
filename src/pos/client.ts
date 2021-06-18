@@ -150,11 +150,6 @@ class ChainImpl implements ChainClient {
 
         return this.pos.produceBlock(this.chainId, overrides);
     }
-
-    async cycle(): Promise<boolean> {
-        // nothing to do, unless its a pool
-        return false;
-    }
 }
 
 class PoolChainImpl extends ChainImpl {
@@ -194,6 +189,86 @@ class PoolChainImpl extends ChainImpl {
         };
 
         return pool.produceBlock(this.chainId, overrides);
+    }
+}
+
+export class ProtocolImpl extends AbstractProtocolClient {
+    private gasPriceProvider: GasPriceProvider;
+
+    private chains: ChainClient[];
+
+    constructor(
+        pos: PoS,
+        authManager: WorkerAuthManager,
+        gasPriceProvider: GasPriceProvider
+    ) {
+        super(pos, authManager);
+        this.gasPriceProvider = gasPriceProvider;
+        this.chains = [];
+    }
+
+    async cycle(): Promise<boolean> {
+        // nothing to do, not a pool
+        return false;
+    }
+
+    getChain(index: number): ChainClient {
+        // create chains on demand
+        while (index >= this.chains.length) {
+            const chain = new ChainImpl(
+                this.pos,
+                this.gasPriceProvider,
+                this.chains.length
+            );
+            this.chains.push(chain);
+        }
+        return this.chains[index];
+    }
+}
+
+export class PoolProtocolImpl extends AbstractProtocolClient {
+    private pool: string;
+
+    private gasPriceProvider: GasPriceProvider;
+
+    private chains: ChainClient[];
+
+    private stakingPool: StakingPool | undefined;
+
+    constructor(
+        pos: PoS,
+        pool: string,
+        authManager: WorkerAuthManager,
+        gasPriceProvider: GasPriceProvider
+    ) {
+        super(pos, authManager);
+        this.pos = pos;
+        this.pool = pool;
+        this.gasPriceProvider = gasPriceProvider;
+        this.chains = [];
+    }
+
+    getChain(index: number): ChainClient {
+        while (index >= this.chains.length) {
+            const chain = new PoolChainImpl(
+                this.pos,
+                this.gasPriceProvider,
+                this.chains.length,
+                this.pool
+            );
+            this.chains.push(chain);
+        }
+        return this.chains[index];
+    }
+
+    private async getStakingPool(): Promise<StakingPool> {
+        if (!this.stakingPool) {
+            this.stakingPool = await createStakingPool(
+                this.pool,
+                this.pos.signer
+            );
+        }
+        return this.stakingPool;
     }
 
     async cycle(): Promise<boolean> {
@@ -271,53 +346,5 @@ class PoolChainImpl extends ChainImpl {
         }
 
         return true;
-    }
-}
-
-export class ProtocolImpl extends AbstractProtocolClient {
-    private pos: PoS;
-
-    private pool: string | undefined;
-
-    private gasPriceProvider: GasPriceProvider;
-
-    private chains: ChainClient[];
-
-    constructor(
-        pos: PoS,
-        pool: string | undefined,
-        authManager: WorkerAuthManager,
-        gasPriceProvider: GasPriceProvider
-    ) {
-        super(authManager, pos.address);
-        this.pos = pos;
-        this.pool = pool;
-        this.gasPriceProvider = gasPriceProvider;
-        this.chains = [];
-    }
-
-    async getNumberOfChains(): Promise<number> {
-        const i = await this.pos.currentIndex();
-        return i.toNumber();
-    }
-
-    getChain(index: number): ChainClient {
-        // create chains on demand
-        while (index >= this.chains.length) {
-            const chain: ChainClient = this.pool
-                ? new PoolChainImpl(
-                      this.pos,
-                      this.gasPriceProvider,
-                      this.chains.length,
-                      this.pool
-                  )
-                : new ChainImpl(
-                      this.pos,
-                      this.gasPriceProvider,
-                      this.chains.length
-                  );
-            this.chains.push(chain);
-        }
-        return this.chains[index];
     }
 }

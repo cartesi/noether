@@ -173,10 +173,7 @@ export class BlockProducer {
     }
 
     async cycle() {
-        const chains = await this.client.getNumberOfChains();
-        for (let i = 0; i < chains; i++) {
-            const chain = this.client.getChain(i);
-            await chain.cycle();
-        }
+        // XXX: what should we do with the boolean return value?
+        await this.client.cycle();
     }
 }
