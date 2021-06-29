@@ -20,17 +20,17 @@ import {
     RewardManager__factory,
     Staking,
     StakingImpl__factory,
-    StakingPool,
-    StakingPool__factory,
-} from "@cartesi/pos-private";
+} from "@cartesi/pos";
 import { ChainMap, getAddress } from ".";
 
-import mainnet from "@cartesi/pos-private/export/abi/mainnet.json";
-import goerli from "@cartesi/pos-private/export/abi/goerli.json";
+import mainnet from "@cartesi/pos/export/abi/mainnet.json";
+import goerli from "@cartesi/pos/export/abi/goerli.json";
+import ropsten from "@cartesi/pos/export/abi/ropsten.json";
 import localhost from "./localhost.json";
 
 const abis: ChainMap = {
     1: mainnet,
+    3: ropsten,
     5: goerli,
     31337: localhost,
 };
@@ -50,13 +50,6 @@ export const createStaking = async (
 ): Promise<Staking> => {
     const address = await pos.getStakingAddress(chainId);
     return StakingImpl__factory.connect(address, signer);
-};
-
-export const createStakingPool = async (
-    address: string,
-    signer: Signer
-): Promise<StakingPool> => {
-    return StakingPool__factory.connect(address, signer);
 };
 
 export const createBlockSelector = async (

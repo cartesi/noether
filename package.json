@@ -8,8 +8,9 @@
         "test": "mocha"
     },
     "dependencies": {
-        "@cartesi/pos-private": "^2.0.0-alpha.11",
-        "@cartesi/util": "^1.0.0",
+        "@cartesi/pos": "^1.1.2",
+        "@cartesi/staking-pool": "^1.0.0-alpha.1",
+        "@cartesi/util": "^1.0.1",
         "axios": "^0.21.1",
         "chalk": "^4.1.1",
         "ethers": "^5.1.4",

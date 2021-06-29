@@ -14,13 +14,8 @@ import humanizeDuration from "humanize-duration";
 import pTimeout from "p-timeout";
 import { formatCTSI } from "../util";
 import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "../config";
-import {
-    BlockSelector,
-    PoS,
-    RewardManager,
-    Staking,
-    StakingPool,
-} from "@cartesi/pos-private";
+import { BlockSelector, PoS, RewardManager, Staking } from "@cartesi/pos";
+import { StakingPool } from "@cartesi/staking-pool";
 import { WorkerAuthManager } from "@cartesi/util";
 import { BigNumber, Overrides, ContractTransaction } from "ethers";
 import { ChainClient, AbstractProtocolClient } from ".";

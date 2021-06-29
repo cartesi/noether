@@ -10,33 +10,22 @@
 // specific language governing permissions and limitations under the License.
 
 import { Signer } from "ethers";
-import { Network } from "@ethersproject/providers";
-import {
-    WorkerManagerAuthManagerImpl,
-    WorkerManagerAuthManagerImpl__factory,
-} from "@cartesi/util";
-import { ChainMap, getAddress } from ".";
+import { StakingPool, StakingPool__factory } from "@cartesi/staking-pool";
+import { ChainMap } from ".";
 
-import mainnet from "@cartesi/util/export/abi/mainnet.json";
-import goerli from "@cartesi/util/export/abi/goerli.json";
-import ropsten from "@cartesi/util/export/abi/ropsten.json";
+import goerli from "@cartesi/staking-pool/export/abi/goerli.json";
+import ropsten from "@cartesi/staking-pool/export/abi/ropsten.json";
 import localhost from "./localhost.json";
 
 const abis: ChainMap = {
-    1: mainnet,
     3: ropsten,
     5: goerli,
     31337: localhost,
 };
 
-export const createWorkerManager = async (
-    network: Network,
+export const createStakingPool = async (
+    address: string,
     signer: Signer
-): Promise<WorkerManagerAuthManagerImpl> => {
-    const address = getAddress(
-        network.chainId,
-        abis,
-        "WorkerManagerAuthManagerImpl"
-    );
-    return WorkerManagerAuthManagerImpl__factory.connect(address, signer);
+): Promise<StakingPool> => {
+    return StakingPool__factory.connect(address, signer);
 };
