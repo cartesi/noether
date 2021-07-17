@@ -29,7 +29,7 @@ export interface ProtocolClient {
     isAuthorized(): Promise<boolean>;
     getNumberOfChains(): Promise<number>;
     getChain(index: number): ChainClient;
-    cycle(): Promise<boolean>;
+    rebalance(): Promise<boolean>;
 }
 
 export abstract class AbstractProtocolClient implements ProtocolClient {
@@ -53,7 +53,7 @@ export abstract class AbstractProtocolClient implements ProtocolClient {
     }
 
     abstract getChain(index: number): ChainClient;
-    abstract cycle(): Promise<boolean>;
+    abstract rebalance(): Promise<boolean>;
 }
 
 export * from "./client";

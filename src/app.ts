@@ -95,7 +95,7 @@ export const app = async (
             await blockProducer.produceBlock(user);
 
             // maintenance calls
-            await blockProducer.cycle();
+            await blockProducer.rebalance();
         } catch (e) {
             // print the error, but continue polling
             log.error(e);

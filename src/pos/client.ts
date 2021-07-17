@@ -202,7 +202,7 @@ export class ProtocolImpl extends AbstractProtocolClient {
         this.chains = [];
     }
 
-    async cycle(): Promise<boolean> {
+    async rebalance(): Promise<boolean> {
         // nothing to do, not a pool
         return false;
     }
@@ -266,27 +266,20 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
         return this.stakingPool;
     }
 
-    async cycle(): Promise<boolean> {
+    async rebalance(): Promise<boolean> {
         const pool = await this.getStakingPool();
+        const { stake, unstake, withdraw } = await pool.amounts();
 
-        // check if we need to cycle stake maturation
-        const [
-            canCycleStakeMaturation,
-            currentQueuedTotal,
-            currentMaturingTotal,
-        ] = await pool.canCycleStakeMaturation();
-        if (
-            canCycleStakeMaturation &&
-            (currentQueuedTotal.gt(0) || currentMaturingTotal.gt(0))
-        ) {
+        // check if we need to rebalance pool
+        if (stake.gt(0) || unstake.gt(0) || withdraw.gt(0)) {
             log.info(
-                `[${
-                    pool.address
-                }] cycling stake maturation, queue has ${formatCTSI(
-                    currentQueuedTotal
-                )} CTSI, maturing ${formatCTSI(currentMaturingTotal)}`
+                `[${pool.address}] rebalancing, stake ${formatCTSI(
+                    stake
+                )} CTSI, unstake ${formatCTSI(
+                    unstake
+                )} CTSI, withdraw ${formatCTSI(withdraw)} CTSI`
             );
-            const tx = await pool.cycleStakeMaturation();
+            const tx = await pool.rebalance();
             log.info(
                 `[${pool.address}] ⏱ transaction ${tx.hash} with price ${tx.gasPrice}, waiting for ${CONFIRMATIONS} confirmation(s)...`
             );
@@ -300,43 +293,7 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
             );
 
             log.info(
-                `[${pool.address}}] 🎉 maturation cycled, gas used ${receipt.gasUsed}`
-            );
-        }
-
-        // check if we need to cycle withdraw release
-        const [
-            canCycleWithdrawRelease,
-            currentWithdrawQueuedTotal,
-            currentWithdrawMaturingTotal,
-        ] = await pool.canCycleWithdrawRelease();
-        if (
-            canCycleWithdrawRelease &&
-            (currentWithdrawQueuedTotal.gt(0) ||
-                currentWithdrawMaturingTotal.gt(0))
-        ) {
-            log.info(
-                `[${
-                    pool.address
-                }] cycling withdraw release, queue has ${formatCTSI(
-                    currentWithdrawQueuedTotal
-                )} CTSI, maturing ${formatCTSI(currentWithdrawMaturingTotal)}`
-            );
-            const tx = await pool.cycleWithdrawRelease();
-            log.info(
-                `[${pool.address}] ⏱ transaction ${tx.hash} with price ${tx.gasPrice}, waiting for ${CONFIRMATIONS} confirmation(s)...`
-            );
-            // wait for confirmation, with a timeout
-            const receipt = await pTimeout(
-                tx.wait(CONFIRMATIONS),
-                CONFIRMATION_TIMEOUT,
-                `⏰ timeout waiting ${humanizeDuration(
-                    CONFIRMATION_TIMEOUT
-                )} for confirmation`
-            );
-
-            log.info(
-                `[${pool.address}}] 🎉 withdraw cycled, gas used ${receipt.gasUsed}`
+                `[${pool.address}}] 🎉 rebalanced, gas used ${receipt.gasUsed}`
             );
         }
 

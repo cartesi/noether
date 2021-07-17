@@ -172,8 +172,8 @@ export class BlockProducer {
         return true;
     }
 
-    async cycle() {
+    async rebalance() {
         // XXX: what should we do with the boolean return value?
-        await this.client.cycle();
+        await this.client.rebalance();
     }
 }
