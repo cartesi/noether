@@ -17,7 +17,7 @@
         "humanize-duration": "^3.27.0",
         "loglevel": "^1.7.1",
         "loglevel-plugin-prefix": "^0.8.4",
-        "p-timeout": "^5.0.0",
+        "p-timeout": "^4.1.0",
         "prompts": "^2.4.1",
         "ts-node": "^10.1.0",
         "ts-retry-promise": "^0.6.0",
