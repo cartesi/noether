@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+
+  noether:
+    container_name: noether
+    build:
+      context: .
+      target: base
+    command: tail -f /dev/null
+    volumes:
+      - .:/app
+    working_dir: /app
