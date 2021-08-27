@@ -4,5 +4,5 @@
 /node_modules/
 /.dockerignore
 /.gitignore
-/docker-compose.yml
+/docker-compose.dev.yml
 /Dockerfile
