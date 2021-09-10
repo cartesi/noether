@@ -164,7 +164,7 @@ export class BlockProducer {
                     log.info(
                         `[${this.address}/${chainId}] 🎉 block produced, gas used ${receipt.gasUsed}`
                     );
-                } catch (e) {
+                } catch (e: any) {
                     log.error(e.message);
                 }
             }
