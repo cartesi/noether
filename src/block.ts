@@ -12,10 +12,12 @@
 import log from "loglevel";
 import humanizeDuration from "humanize-duration";
 import pTimeout from "p-timeout";
-import { formatCTSI } from "./util";
 
+import { formatCTSI } from "./util";
 import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "./config";
 import { ProtocolClient } from "./pos";
+import * as monitoring from "./monitoring";
+import { constants } from "ethers";
 
 const explorerUrl = "https://explorer.cartesi.io/staking";
 
@@ -81,6 +83,9 @@ export class BlockProducer {
             const timestamp = (await chain.getMaturingTimestamp(user)) * 1000;
             const now = Date.now();
 
+            // track stake to monitoring
+            monitoring.stake.set(staked.div(constants.WeiPerEther).toNumber());
+
             // print stake
             if (maturing.gt(0)) {
                 if (timestamp > now) {
@@ -131,6 +136,9 @@ export class BlockProducer {
             );
             if (canProduce) {
                 try {
+                    // count eligibility to monitoring
+                    monitoring.eligibility.inc();
+
                     const blockInterval = await chain.getBlockInterval(user);
                     if (
                         blockInterval.mod(256).eq(0) ||
@@ -164,6 +172,9 @@ export class BlockProducer {
                     log.info(
                         `[${this.address}/${chainId}] 🎉 block produced, gas used ${receipt.gasUsed}`
                     );
+
+                    // count block produced to monitoring
+                    monitoring.block.inc();
                 } catch (e: any) {
                     log.error(e.message);
                 }

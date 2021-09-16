@@ -13,6 +13,7 @@ import log from "loglevel";
 import { Provider } from "@ethersproject/providers";
 import { formatEther } from "@ethersproject/units";
 
+import * as monitoring from "./monitoring";
 import { sleep } from "./util";
 import { connect } from "./connection";
 import { BlockProducer } from "./block";
@@ -38,6 +39,9 @@ export const app = async (
     accountIndex: number,
     wallet: string | undefined,
     create: boolean,
+    monitor: boolean,
+    hostname: string,
+    port: number,
     gasPriceProviderType: GasPriceProviderType,
     gasStationAPIKey: string | undefined
 ) => {
@@ -56,8 +60,24 @@ export const app = async (
         gasStationAPIKey
     );
 
+    // set labels of metrics
+    monitoring.register.setDefaultLabels({
+        worker: address,
+    });
+
+    if (monitor) {
+        // monitoring service
+        monitoring.start(hostname, port);
+    }
+
     // worker hiring
     const user = await hire(workerManager, gasPriceProvider, address);
+
+    // set labels of metrics
+    monitoring.register.setDefaultLabels({
+        worker: address,
+        user,
+    });
 
     if (!user) {
         log.error(`failed to hire`);

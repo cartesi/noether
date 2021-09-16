@@ -21,6 +21,9 @@ interface Args {
     wallet: string | undefined;
     accountIndex: number;
     create: boolean;
+    monitoring: boolean;
+    hostname: string;
+    port: number;
     gasPrice: GasPriceProviderType;
     gasStationAPIKey: string;
     verbose: boolean;
@@ -59,6 +62,24 @@ export const builder = (yargs: Argv) => {
             alias: "c",
             default: false,
         })
+        .option("monitoring", {
+            describe: "Start monitoring server",
+            type: "boolean",
+            alias: "m",
+            default: false,
+        })
+        .option("hostname", {
+            describe: "Host of monitoring server",
+            type: "string",
+            alias: "h",
+            default: "127.0.0.1",
+        })
+        .option("port", {
+            describe: "Port of monitoring server",
+            type: "number",
+            alias: "p",
+            default: 8080,
+        })
         .option("verbose", {
             type: "boolean",
             alias: "v",
@@ -71,6 +92,9 @@ export const handler = (args: Args) => {
         args.accountIndex,
         args.wallet,
         args.create,
+        args.monitoring,
+        args.hostname,
+        args.port,
         args.gasPrice,
         args.gasStationAPIKey
     );

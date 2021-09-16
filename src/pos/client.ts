@@ -12,6 +12,8 @@
 import log from "loglevel";
 import humanizeDuration from "humanize-duration";
 import pTimeout from "p-timeout";
+
+import * as monitoring from "../monitoring";
 import { formatCTSI } from "../util";
 import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "../config";
 import { BlockSelector, PoS, RewardManager, Staking } from "@cartesi/pos";
@@ -293,8 +295,11 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
             );
 
             log.info(
-                `[${pool.address}}] 🎉 rebalanced, gas used ${receipt.gasUsed}`
+                `[${pool.address}}] 🎉 rebalanced, gas used ${receipt.gasUsed} at price ${receipt.effectiveGasPrice}`
             );
+
+            // increment rebalance counter
+            monitoring.rebalance.inc();
         }
 
         return true;
