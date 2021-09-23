@@ -78,7 +78,7 @@ export const builder = (yargs: Argv) => {
             describe: "Port of monitoring server",
             type: "number",
             alias: "p",
-            default: 8080,
+            default: 9860,
         })
         .option("verbose", {
             type: "boolean",
