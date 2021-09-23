@@ -17,6 +17,12 @@ import client from "prom-client";
 // create a Registry which registers the metrics
 export const register = new client.Registry();
 
+// metric for the node ETH balance
+export const balance = new client.Gauge({
+    name: "balance",
+    help: "ETH balance",
+});
+
 // metric for the stake value
 export const stake = new client.Gauge({
     name: "stake",
@@ -41,9 +47,18 @@ export const rebalance = new client.Counter({
     help: "Pool rebalanced",
 });
 
+// metric for any kind of error raised during operation
+export const errors = new client.Counter({
+    name: "errors",
+    help: "Error counter",
+});
+
+register.registerMetric(balance);
 register.registerMetric(stake);
 register.registerMetric(eligibility);
 register.registerMetric(block);
+register.registerMetric(rebalance);
+register.registerMetric(errors);
 
 client.collectDefaultMetrics({
     register,

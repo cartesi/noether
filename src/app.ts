@@ -12,6 +12,7 @@
 import log from "loglevel";
 import { Provider } from "@ethersproject/providers";
 import { formatEther } from "@ethersproject/units";
+import { constants } from "ethers";
 
 import * as monitoring from "./monitoring";
 import { sleep } from "./util";
@@ -26,7 +27,12 @@ import {
 } from "./gas-price/gas-price-provider";
 
 const checkBalance = async (provider: Provider, address: string) => {
+    // query node wallet ETH balance
     const balance = await provider.getBalance(address);
+
+    // monitor ETH balance
+    monitoring.balance.set(balance.div(constants.WeiPerEther).toNumber());
+
     if (balance.lt(BALANCE_THRESHOLD)) {
         log.warn(
             `low balance: ${formatEther(balance)} ETH, transfer more funds`
@@ -119,6 +125,9 @@ export const app = async (
         } catch (e) {
             // print the error, but continue polling
             log.error(e);
+
+            // increase error counter
+            monitoring.errors.inc();
         }
 
         // go to sleep
