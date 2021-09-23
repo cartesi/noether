@@ -19,37 +19,37 @@ export const register = new client.Registry();
 
 // metric for the node ETH balance
 export const balance = new client.Gauge({
-    name: "balance",
+    name: "noether_balance_eth",
     help: "ETH balance",
 });
 
 // metric for the stake value
 export const stake = new client.Gauge({
-    name: "stake",
-    help: "Stake of the node owner",
+    name: "noether_stake_ctsi",
+    help: "CTSI stake the node owner",
 });
 
 // metric for counting production opportunities
 export const eligibility = new client.Counter({
-    name: "eligibility",
+    name: "noether_eligibility_total",
     help: "Block production opportunities",
 });
 
 // metric for blocks produced
 export const block = new client.Counter({
-    name: "block",
+    name: "noether_block_total",
     help: "Blocks produced",
 });
 
 // metric for number of rebalances
 export const rebalance = new client.Counter({
-    name: "rebalance",
-    help: "Pool rebalanced",
+    name: "noether_rebalance_total",
+    help: "Pool rebalance operations",
 });
 
 // metric for any kind of error raised during operation
 export const errors = new client.Counter({
-    name: "errors",
+    name: "noether_errors_total",
     help: "Error counter",
 });
 
