@@ -130,6 +130,7 @@ export class BlockProducer {
 
             // check if can produce
             const canProduce = await chain.canProduceBlock(user, staked);
+            monitoring.eligibility_checks.inc();
 
             log.debug(
                 `[${this.address}/${chainId}] eligibleForNextBlock=${canProduce}`

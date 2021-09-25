@@ -30,6 +30,12 @@ export const stake = new client.Gauge({
 });
 
 // metric for counting production opportunities
+export const eligibility_checks = new client.Counter({
+    name: "noether_eligibility_checks_total",
+    help: "Number of eligibility checks",
+});
+
+// metric for counting production opportunities
 export const eligibility = new client.Counter({
     name: "noether_eligibility_total",
     help: "Block production opportunities",
@@ -55,6 +61,7 @@ export const errors = new client.Counter({
 
 register.registerMetric(balance);
 register.registerMetric(stake);
+register.registerMetric(eligibility_checks);
 register.registerMetric(eligibility);
 register.registerMetric(block);
 register.registerMetric(rebalance);
