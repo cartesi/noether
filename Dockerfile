@@ -2,9 +2,9 @@
 # Base stage.
 # This stage installs common and required dependencies for next stages
 #
-FROM node:15.14.0-alpine AS base
+FROM node:16.10.0-alpine AS base
 
-RUN apk add --no-cache git python make g++
+RUN apk add --no-cache git python3 make g++
 
 #
 # Builder stage.

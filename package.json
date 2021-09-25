@@ -49,7 +49,7 @@
         "source-map-support": "^0.5.20"
     },
     "engines": {
-        "node": "15.x"
+        "node": "16.x"
     },
     "name": "noether",
     "version": "2.0.0-beta.0",
