@@ -10,11 +10,11 @@ docker build -t cartesi/noether .
 
 # Running
 
-There are three possible environments with which to run this Noether node:
+There are three possible environment types one can use to run Noether:
 
-- Local private network
-- Goerli public network
-- Mainnet public network
+-   Mainnet public network
+-   Public test networks
+-   Local private network
 
 Instructions for each environment are presented in the following sections.
 
@@ -50,8 +50,8 @@ After you run the node, you should see a log similar to the one below:
 Once that is done, you now need to hire your new node, so as to make it work on your behalf.
 For that matter, you can use the [Cartesi Explorer](https://explorer.cartesi.io) and perform the following tasks:
 
-- Go to https://explorer.cartesi.io and connect to your personal wallet using [MetaMask](https://metamask.io).
-- [Click on "Staking"](https://explorer.cartesi.io/staking), and then on `"Click to hire node"`. Fill in the form with your node address (which in this example is `0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9`), set the amount of ETH you want to send to your node wallet, and click `"Hire Node"`. This will send a transaction and make your node "wake up" and start working on your behalf. The amount of ETH you decide to send depends on how long you expect to keep your node running. Each block you produce can be estimated to spend around `156454` gas units, so it is possible to [calculate](https://ethgasstation.info/calculatorTxV.php) how much ETH you will spend based on the network gas price. You should keep an eye on your node funds, and restock it whenever you deem necessary.
+-   Go to https://explorer.cartesi.io and connect to your personal wallet using [MetaMask](https://metamask.io).
+-   [Click on "Staking"](https://explorer.cartesi.io/staking), and then on `"Click to hire node"`. Fill in the form with your node address (which in this example is `0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9`), set the amount of ETH you want to send to your node wallet, and click `"Hire Node"`. This will send a transaction and make your node "wake up" and start working on your behalf. The amount of ETH you decide to send depends on how long you expect to keep your node running. Each block you produce can be estimated to spend around `156454` gas units, so it is possible to [calculate](https://ethgasstation.info/calculatorTxV.php) how much ETH you will spend based on the network gas price. You should keep an eye on your node funds, and restock it whenever you deem necessary.
 
 ### Additional options
 
@@ -87,21 +87,21 @@ safeLow: expected to be mined in < 30 minutes
 
 If you are using environment variables you can use the variables `GAS_PRICE_PROVIDER` and `GAS_STATION_API_KEY` for the same effect.
 
-## Goerli public network
+## Public test network
 
-Running on [Goerli](https://goerli.net) is very similar to running on `mainnet`, with the following differences:
+Running on [Goerli](https://goerli.net) or [Ropsten](https://github.com/ethereum/ropsten) is very similar to running on `mainnet`, with the following differences:
 
-1) The command is:
+1. The command is:
 
 ```
-docker run -it --rm --name cartesi_goerli_noether -v cartesi_goerli_wallet:/root/.ethereum cartesi/noether --url https://goerli.infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
+docker run -it --rm --name cartesi_testnet_noether -v cartesi_testnet_wallet:/root/.ethereum cartesi/noether --url https://[goerli|ropsten].infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
 ```
 
-2) Cloudflare Ethereum Gateway does not provide an option for Goerli, so we use [Infura](https://infura.io). You need to setup an Infura account, create an application and use the application URL in the command above.
+2. Cloudflare Ethereum Gateway does not provide an option for testnets, so we use [Infura](https://infura.io). You need to setup an Infura account, create an application and use the application URL in the command above.
 
-3) You don't spend real money
+3. You don't spend real money
 
-4) You need fake CTSI to stake. Ask Cartesi team at [Discord](https://discord.gg/n85Msyp).
+4. You need fake CTSI to stake. Ask Cartesi team at [Discord](https://discord.gg/n85Msyp).
 
 ## Local private network
 
@@ -168,6 +168,8 @@ npx hardhat --network localhost ctsi:allow 100000000000000000000
 npx hardhat --network localhost pos:stake 100000000000000000000
 ```
 
+# Monitoring
+
 # Contributing
 
 Thank you for your interest in Cartesi! Head over to our [Contributing Guidelines](CONTRIBUTING.md) for instructions on how to sign our Contributors Agreement and get started with
@@ -177,8 +179,8 @@ Please note we have a [Code of Conduct](CODE_OF_CONDUCT.md), please follow it in
 
 # Authors
 
-* *Danilo Tuler*
-* *Gabriel Coutinho*
+-   _Danilo Tuler_
+-   _Gabriel Coutinho_
 
 # License
 
