@@ -52,7 +52,7 @@ export const app = async (
     gasStationAPIKey: string | undefined
 ) => {
     // connect to node
-    const { address, pos, provider, workerManager } = await connect(
+    const { address, network, pos, provider, workerManager } = await connect(
         url,
         accountIndex,
         wallet,
@@ -68,6 +68,7 @@ export const app = async (
 
     // set labels of metrics
     monitoring.register.setDefaultLabels({
+        network: network.name,
         worker: address,
     });
 
@@ -81,6 +82,7 @@ export const app = async (
 
     // set labels of metrics
     monitoring.register.setDefaultLabels({
+        network: network.name,
         worker: address,
         user,
     });
