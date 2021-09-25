@@ -47,6 +47,7 @@ const _hire = async (
         do {
             await sleep(POLLING_INTERVAL);
             available = await workerManager.isAvailable(address);
+            log.info(`${address} available for hiring`);
         } while (available);
     }
 
