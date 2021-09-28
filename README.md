@@ -87,6 +87,35 @@ safeLow: expected to be mined in < 30 minutes
 
 If you are using environment variables you can use the variables `GAS_PRICE_PROVIDER` and `GAS_STATION_API_KEY` for the same effect.
 
+### Monitoring
+
+Noether provides monitoring metrics compatible with [Prometheus](https://prometheus.io/).
+Prometheus uses a pull based model, not a push based one, which means that Noether expose metrics through a HTTP server, that is scraped by Prometheus.
+
+These are the metrics exposed:
+
+| Metric                           | Type    | Description                    |
+| -------------------------------- | ------- | ------------------------------ |
+| noether_balance_eth              | Gauge   | ETH balance of the node wallet |
+| noether_stake_ctsi               | Gauge   | CTSI stake of the node owner   |
+| noether_eligibility_checks_total | Counter | Number of eligibility checks   |
+| noether_eligibility_total        | Counter | Block production opportunities |
+| noether_block_total              | Counter | Blocks produced                |
+| noether_rebalance_total          | Counter | Pool rebalance operations      |
+| noether_errors_total             | Counter | Error counter                  |
+
+To run Nother with monitoring metrics use the `--monitoring` command line option.
+This will expose the above metrics at `http://127.0.0.1:9860/metrics`.
+If you want to change the binding hostname or port, use the command line options below.
+
+| Option       | Environment variable | Default   | Description                    |
+| ------------ | -------------------- | --------- | ------------------------------ |
+| --monitoring |                      | false     | Enable monitoring server       |
+| --hostname   |                      | 127.0.0.1 | Monitoring server binding host |
+| --port       |                      | 9860      | Monitoring server port         |
+
+Note that the default binding hostname is `127.0.0.1`, which means it's only accessible from the same machine the node is running on. The node should not be exposed to the internet without some sort of security ingress rules in place.
+
 ## Public test network
 
 Running on [Goerli](https://goerli.net) or [Ropsten](https://github.com/ethereum/ropsten) is very similar to running on `mainnet`, with the following differences:
@@ -167,8 +196,6 @@ Finally, you can define an allowance and stake any given amount:
 npx hardhat --network localhost ctsi:allow 100000000000000000000
 npx hardhat --network localhost pos:stake 100000000000000000000
 ```
-
-# Monitoring
 
 # Contributing
 
