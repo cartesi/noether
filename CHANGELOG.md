@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Support for staking pools
 -   Monitoring metrics for Prometheus
 -   Remove Heroku deployment button
+-   Remove ARM docker images temporarily while we investigate build fail
 
 ## [1.2.0] - 2021-05-03
 
