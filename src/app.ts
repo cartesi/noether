@@ -29,14 +29,14 @@ import {
 const checkBalance = async (provider: Provider, address: string) => {
     // query node wallet ETH balance
     const balance = await provider.getBalance(address);
+    const label = formatEther(balance);
 
     // monitor ETH balance
-    monitoring.balance.set(balance.div(constants.WeiPerEther).toNumber());
+    monitoring.balance.set(Number.parseFloat(label));
 
+    // print warning if below threshold
     if (balance.lt(BALANCE_THRESHOLD)) {
-        log.warn(
-            `low balance: ${formatEther(balance)} ETH, transfer more funds`
-        );
+        log.warn(`low balance: ${label} ETH, transfer more funds`);
     }
 };
 
