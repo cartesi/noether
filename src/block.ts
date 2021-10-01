@@ -158,7 +158,7 @@ export class BlockProducer {
 
                     const tx = await chain.produceBlock();
                     log.info(
-                        `[${this.address}/${chainId}] ⏱ transaction ${tx.hash} with price ${tx.gasPrice}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+                        `[${this.address}/${chainId}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
                     );
 
                     // wait for confirmation, with a timeout

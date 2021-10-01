@@ -283,7 +283,7 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
             );
             const tx = await pool.rebalance();
             log.info(
-                `[${pool.address}] ⏱ transaction ${tx.hash} with price ${tx.gasPrice}, waiting for ${CONFIRMATIONS} confirmation(s)...`
+                `[${pool.address}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
             );
             // wait for confirmation, with a timeout
             const receipt = await pTimeout(
