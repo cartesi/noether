@@ -34,7 +34,7 @@ const _hire = async (
         return workerManager.getOwner(address);
     }
 
-    if (await retire(workerManager, address)) {
+    if (await retire(workerManager, gasPriceProvider, address)) {
         // if retire returns true, exit
         process.exit(0);
     }
@@ -87,6 +87,7 @@ export const isPool = async (
 
 export const retire = async (
     workerManager: WorkerManager,
+    gasPriceProvider: GasPriceProvider,
     address: string
 ): Promise<boolean> => {
     const retired = await workerManager.isRetired(address);
@@ -112,7 +113,7 @@ export const retire = async (
         });
 
         // get gas price from provider
-        const gasPrice = await provider.getGasPrice();
+        const gasPrice = await gasPriceProvider.getGasPrice();
 
         // calculate the fees
         const fee = gasPrice.mul(gas);
@@ -125,6 +126,8 @@ export const retire = async (
         const tx = await signer.sendTransaction({
             to: user,
             value,
+            gasLimit: gas,
+            gasPrice,
         });
         log.info(`transaction ${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(CONFIRMATIONS);

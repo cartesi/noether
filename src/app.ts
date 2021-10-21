@@ -112,7 +112,7 @@ export const app = async (
     while (true) {
         try {
             // check if node retired
-            if (await retire(workerManager, address)) {
+            if (await retire(workerManager, gasPriceProvider, address)) {
                 break;
             }
 
