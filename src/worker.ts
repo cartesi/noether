@@ -16,17 +16,19 @@ import { WorkerManager } from "@cartesi/util";
 import { sleep } from "./util";
 import {
     CONFIRMATIONS,
+    GAS_PRICE_MULTIPLIER,
     POLLING_INTERVAL,
     RETRY_INTERVAL,
     TIMEOUT,
 } from "./config";
 import { Overrides } from "@ethersproject/contracts";
-import { GasPriceProvider } from "./gas-price/gas-price-provider";
+import TransactionManager from "./transactionManager";
+import ProviderGasPriceProvider from "./gas-price/providers/provider-gas-price-provider";
 import { createStakingPool } from "./contracts";
 
 const _hire = async (
     workerManager: WorkerManager,
-    gasPriceProvider: GasPriceProvider,
+    transactionManager: TransactionManager,
     address: string
 ): Promise<string | undefined> => {
     const owned = await workerManager.isOwned(address);
@@ -36,7 +38,7 @@ const _hire = async (
     }
 
     const user = await workerManager.getUser(address);
-    if (await retire(workerManager, gasPriceProvider, address, user)) {
+    if (await retire(workerManager, address, user)) {
         // if retire returns true, exit
         process.exit(0);
     }
@@ -59,10 +61,7 @@ const _hire = async (
         const user = await workerManager.getUser(address);
         log.info(`accepting job from ${user}...`);
 
-        // evaluate the gas price
-        const gasPrice = await gasPriceProvider.getGasPrice();
-        const overrides: Overrides = { gasPrice };
-
+        const overrides: Overrides = await transactionManager.getOverrides();
         const tx = await workerManager.acceptJob(overrides);
         log.info(`transaction ${tx.hash}, waiting for confirmation...`);
         const receipt = await tx.wait(CONFIRMATIONS);
@@ -89,7 +88,6 @@ export const isPool = async (
 
 export const retire = async (
     workerManager: WorkerManager,
-    gasPriceProvider: GasPriceProvider,
     address: string,
     user: string
 ): Promise<boolean> => {
@@ -121,7 +119,12 @@ export const retire = async (
         });
 
         // get gas price from provider
-        const gasPrice = await gasPriceProvider.getGasPrice();
+        // do not use the transaction manager here because we need a non "EIP-1559" gas price
+        const gasPriceProvider = new ProviderGasPriceProvider(
+            provider,
+            GAS_PRICE_MULTIPLIER
+        );
+        const { gasPrice } = await gasPriceProvider.getGasPrice();
 
         // calculate the fees
         const fee = gasPrice.mul(gas);

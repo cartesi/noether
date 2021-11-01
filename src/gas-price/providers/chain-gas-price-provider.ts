@@ -9,8 +9,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { BigNumber } from "ethers";
-import { GasPriceProvider } from "../gas-price-provider";
+import { GasPriceOverrides, GasPriceProvider } from "../gas-price-provider";
 import log from "loglevel";
 
 export default class ChainGasPriceProvider implements GasPriceProvider {
@@ -24,7 +23,7 @@ export default class ChainGasPriceProvider implements GasPriceProvider {
         return this.gasPriceProviders;
     }
 
-    getGasPrice = async (): Promise<BigNumber> => {
+    getGasPrice = async (): Promise<GasPriceOverrides> => {
         for (const gasPriceProvider of this.gasPriceProviders) {
             try {
                 return await gasPriceProvider.getGasPrice();

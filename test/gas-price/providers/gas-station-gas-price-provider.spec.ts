@@ -35,7 +35,7 @@ describe("gas station gas price provider test suite", () => {
             profile,
             key: "test",
         });
-        const gasPrice = await gasPriceProvider.getGasPrice();
+        const { gasPrice } = await gasPriceProvider.getGasPrice();
         expect(axiosGetSpy.callCount).to.be.eq(1);
         expect(gasPrice.toString()).to.be.eq("45000000000");
     });

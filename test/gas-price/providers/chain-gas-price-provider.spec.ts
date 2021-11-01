@@ -12,7 +12,11 @@
 import chain, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import sinon from "sinon";
-import { GasPriceProvider } from "../../../src/gas-price/gas-price-provider";
+import {
+    GasPriceOverride,
+    GasPriceOverrides,
+    GasPriceProvider,
+} from "../../../src/gas-price/gas-price-provider";
 import { BigNumber } from "ethers";
 import ChainGasPriceProvider from "../../../src/gas-price/providers/chain-gas-price-provider";
 import log from "loglevel";
@@ -29,9 +33,9 @@ class gasProviderMock implements GasPriceProvider {
         this.shouldReject = shouldReject;
     }
 
-    getGasPrice(): Promise<BigNumber> {
-        if (this.shouldReject) return Promise.reject("test rejection");
-        return Promise.resolve(this.gasPrice);
+    async getGasPrice(): Promise<GasPriceOverrides> {
+        if (this.shouldReject) throw "test rejection";
+        return { gasPrice: this.gasPrice };
     }
 }
 
@@ -52,7 +56,8 @@ describe("chain gas price provider test suite", () => {
         ];
         const gasPriceProvider = new ChainGasPriceProvider(gasPriceProviders);
         expect(gasPriceProvider.chain).to.be.eq(gasPriceProviders);
-        const gasPrice = await gasPriceProvider.getGasPrice();
+        const { gasPrice } =
+            (await gasPriceProvider.getGasPrice()) as GasPriceOverride;
         expect(gasPrice.toString()).to.be.eq("2");
     });
 

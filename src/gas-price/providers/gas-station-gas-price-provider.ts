@@ -10,7 +10,7 @@
 // specific language governing permissions and limitations under the License.
 
 import { BigNumber } from "ethers";
-import { GasPriceProvider } from "../gas-price-provider";
+import { GasPriceOverride, GasPriceProvider } from "../gas-price-provider";
 import log from "loglevel";
 import axios from "axios";
 
@@ -38,16 +38,16 @@ export default class GasStationGasPriceProvider implements GasPriceProvider {
         };
     }
 
-    getGasPrice = async (): Promise<BigNumber> => {
+    getGasPrice = async (): Promise<GasPriceOverride> => {
         try {
             const gasStationPrice = await this.requestGasStationPrice();
             const gasPrice = this.gasStationPriceToBigNumber(gasStationPrice);
             log.debug("gas station: fetched gas price", {
                 gasPrice: gasPrice.toString(),
             });
-            return gasPrice;
+            return { gasPrice };
         } catch (error) {
-            log.error("gas station: failed to retrieve gas  price", { error });
+            log.error("gas station: failed to retrieve gas price", { error });
             throw error;
         }
     };
