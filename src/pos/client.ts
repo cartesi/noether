@@ -17,7 +17,7 @@ import * as monitoring from "../monitoring";
 import { formatCTSI } from "../util";
 import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "../config";
 import { BlockSelector, PoS, RewardManager, Staking } from "@cartesi/pos";
-import { StakingPool } from "@cartesi/staking-pool";
+import { StakingPoolImpl } from "@cartesi/staking-pool";
 import { WorkerAuthManager } from "@cartesi/util";
 import { BigNumber, Overrides, ContractTransaction } from "ethers";
 import { ChainClient, AbstractProtocolClient } from ".";
@@ -152,7 +152,7 @@ class ChainImpl implements ChainClient {
 class PoolChainImpl extends ChainImpl {
     private address: string;
 
-    private stakingPool: StakingPool | undefined;
+    private stakingPool: StakingPoolImpl | undefined;
 
     constructor(
         pos: PoS,
@@ -164,7 +164,7 @@ class PoolChainImpl extends ChainImpl {
         this.address = pool;
     }
 
-    private async getStakingPool(): Promise<StakingPool> {
+    private async getStakingPool(): Promise<StakingPoolImpl> {
         if (!this.stakingPool) {
             this.stakingPool = await createStakingPool(
                 this.address,
@@ -230,7 +230,7 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
 
     private chains: ChainClient[];
 
-    private stakingPool: StakingPool | undefined;
+    private stakingPool: StakingPoolImpl | undefined;
 
     constructor(
         pos: PoS,
@@ -258,7 +258,7 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
         return this.chains[index];
     }
 
-    private async getStakingPool(): Promise<StakingPool> {
+    private async getStakingPool(): Promise<StakingPoolImpl> {
         if (!this.stakingPool) {
             this.stakingPool = await createStakingPool(
                 this.pool,

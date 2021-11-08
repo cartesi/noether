@@ -22,6 +22,7 @@ import {
 } from "./config";
 import { Overrides } from "@ethersproject/contracts";
 import { GasPriceProvider } from "./gas-price/gas-price-provider";
+import { createStakingPool } from "./contracts";
 
 const _hire = async (
     workerManager: WorkerManager,
@@ -34,7 +35,8 @@ const _hire = async (
         return workerManager.getOwner(address);
     }
 
-    if (await retire(workerManager, gasPriceProvider, address)) {
+    const user = await workerManager.getUser(address);
+    if (await retire(workerManager, gasPriceProvider, address, user)) {
         // if retire returns true, exit
         process.exit(0);
     }
@@ -88,15 +90,21 @@ export const isPool = async (
 export const retire = async (
     workerManager: WorkerManager,
     gasPriceProvider: GasPriceProvider,
-    address: string
+    address: string,
+    user: string
 ): Promise<boolean> => {
     const retired = await workerManager.isRetired(address);
     if (retired) {
         const provider = workerManager.provider;
         const signer = workerManager.signer;
 
-        // get who is the node owner
-        const user = await workerManager.getUser(address);
+        // get node owner (user or owner of pool)
+        let owner = user;
+        if (await isPool(workerManager, user)) {
+            // get owner of the pool
+            const pool = await createStakingPool(user, workerManager.signer);
+            owner = await pool.owner();
+        }
 
         // get this node remaining balance
         const balance = await provider.getBalance(address);
@@ -108,7 +116,7 @@ export const retire = async (
 
         // estimate gas of transaction
         const gas = await provider.estimateGas({
-            to: user,
+            to: owner,
             value: balance,
         });
 
@@ -121,10 +129,10 @@ export const retire = async (
         // send transaction returning all remaining balance to owner
         const value = balance.sub(fee);
         log.info(
-            `node retired, returning ${formatEther(value)} ETH to user ${user}`
+            `node retired, returning ${formatEther(value)} ETH to user ${owner}`
         );
         const tx = await signer.sendTransaction({
-            to: user,
+            to: owner,
             value,
             gasLimit: gas,
             gasPrice,

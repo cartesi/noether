@@ -12,7 +12,6 @@
 import log from "loglevel";
 import { Provider } from "@ethersproject/providers";
 import { formatEther } from "@ethersproject/units";
-import { constants } from "ethers";
 
 import * as monitoring from "./monitoring";
 import { sleep } from "./util";
@@ -112,7 +111,7 @@ export const app = async (
     while (true) {
         try {
             // check if node retired
-            if (await retire(workerManager, gasPriceProvider, address)) {
+            if (await retire(workerManager, gasPriceProvider, address, user)) {
                 break;
             }
 

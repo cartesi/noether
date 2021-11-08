@@ -10,7 +10,10 @@
 // specific language governing permissions and limitations under the License.
 
 import { Signer } from "ethers";
-import { StakingPool, StakingPool__factory } from "@cartesi/staking-pool";
+import {
+    StakingPoolImpl,
+    StakingPoolImpl__factory,
+} from "@cartesi/staking-pool";
 import { ChainMap } from ".";
 
 import goerli from "@cartesi/staking-pool/export/abi/goerli.json";
@@ -26,6 +29,6 @@ const abis: ChainMap = {
 export const createStakingPool = async (
     address: string,
     signer: Signer
-): Promise<StakingPool> => {
-    return StakingPool__factory.connect(address, signer);
+): Promise<StakingPoolImpl> => {
+    return StakingPoolImpl__factory.connect(address, signer);
 };
