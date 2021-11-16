@@ -139,7 +139,7 @@ In order to do that, clone the [pos-dlib](http://github.com/cartesi-corp/pos-dli
 
 ```
 yarn
-npx hardhat node --export ../noether/src/localhost.json
+npx hardhat node --export ../noether/src/contracts/localhost.json
 ```
 
 This will run a node, deploy all contracts, and write a JSON file with the ABIs and contracts addresses to a file inside the noether source code.
