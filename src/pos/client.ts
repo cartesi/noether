@@ -291,11 +291,6 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
 
             if (this.lastRebalanceTimestamp + this.rebalanceIntervalMillis > Date.now()) {
                 log.info(
-<<<<<<< HEAD
-                    `[${pool.address}] not enough time from last rebalance (${
-                        this.lastRebalanceTimestamp
-                    }). rebalanceInterval = ${this.rebalanceIntervalMillis}`
-=======
                     `[${pool.address}] not enough time since last rebalance (${
                         humanizeDuration(Date.now() - this.lastRebalanceTimestamp)
                     }). rebalanceInterval = ${
@@ -303,7 +298,6 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
                     }. Next rebalance delayed to be executed in ${
                         humanizeDuration(this.lastRebalanceTimestamp + this.rebalanceIntervalMillis)
                     }`
->>>>>>> 20f016b (Add rebalancingInterval param to reduce pool rebalances per day)
                 );
                 return false
             }
