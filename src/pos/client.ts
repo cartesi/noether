@@ -232,17 +232,24 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
 
     private stakingPool: StakingPoolImpl | undefined;
 
+    private lastRebalanceTimestamp: number;
+
+    private rebalanceIntervalMillis: number;
+
     constructor(
         pos: PoS,
         pool: string,
         authManager: WorkerAuthManager,
-        gasPriceProvider: GasPriceProvider
+        gasPriceProvider: GasPriceProvider,
+        rebalanceInterval: number
     ) {
         super(pos, authManager);
         this.pos = pos;
         this.pool = pool;
         this.gasPriceProvider = gasPriceProvider;
         this.chains = [];
+        this.rebalanceIntervalMillis = rebalanceInterval * 60 * 1000;
+        this.lastRebalanceTimestamp = 0;
     }
 
     getChain(index: number): ChainClient {
@@ -281,6 +288,20 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
                     unstake
                 )} CTSI, withdraw ${formatCTSI(withdraw)} CTSI`
             );
+
+            if (this.lastRebalanceTimestamp + this.rebalanceIntervalMillis > Date.now()) {
+                log.info(
+                    `[${pool.address}] not enough time since last rebalance (${
+                        humanizeDuration(Date.now() - this.lastRebalanceTimestamp)
+                    }). rebalanceInterval = ${
+                        humanizeDuration(this.rebalanceIntervalMillis)
+                    }. Next rebalance delayed to be executed in ${
+                        humanizeDuration(this.lastRebalanceTimestamp + this.rebalanceIntervalMillis - Date.now())
+                    }`
+                );
+                return false
+            }
+
             const tx = await pool.rebalance();
             log.info(
                 `[${pool.address}] ⏱ transaction ${tx.hash}, waiting for ${CONFIRMATIONS} confirmation(s)...`
@@ -297,6 +318,8 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
             log.info(
                 `[${pool.address}}] 🎉 rebalanced, gas used ${receipt.gasUsed} at price ${receipt.effectiveGasPrice}`
             );
+
+            this.lastRebalanceTimestamp = Date.now()
 
             // increment rebalance counter
             monitoring.rebalance.inc();
