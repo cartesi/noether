@@ -68,15 +68,15 @@ export const loadFromFile = async (
         // load wallet from file
         const json = fs.readFileSync(filename, "utf-8");
 
-        // read password from stdin
-        const password = await prompts({
+        // if CTSI_WALLET_PASSWORD env variable not set read from stdin
+        const password = process.env.CTSI_WALLET_PASSWORD ? process.env.CTSI_WALLET_PASSWORD : (await prompts({
             type: "password",
             name: "value",
             message: "password",
-        });
+        })).value;
 
         // load wallet
-        return Wallet.fromEncryptedJson(json, password.value);
+        return Wallet.fromEncryptedJson(json, password);
     }
 };
 
