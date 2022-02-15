@@ -14,7 +14,11 @@ import humanizeDuration from "humanize-duration";
 import pTimeout from "p-timeout";
 
 import { formatCTSI } from "./util";
-import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "./config";
+import {
+    CONFIRMATIONS,
+    CONFIRMATION_TIMEOUT,
+    REBALANCE_INTERVAL,
+} from "./config";
 import { ProtocolClient } from "./pos";
 import * as monitoring from "./monitoring";
 import { constants } from "ethers";
@@ -23,8 +27,8 @@ const explorerUrl = "https://explorer.cartesi.io/staking";
 
 export class BlockProducer {
     private address: string;
-
     private client: ProtocolClient;
+    private lastRebalanceCall = 0;
 
     constructor(address: string, client: ProtocolClient) {
         this.address = address;
@@ -185,7 +189,10 @@ export class BlockProducer {
     }
 
     async rebalance() {
-        // XXX: what should we do with the boolean return value?
-        await this.client.rebalance();
+        const currentTimestamp = new Date().getTime();
+        if (currentTimestamp < this.lastRebalanceCall + REBALANCE_INTERVAL)
+            return;
+        if (await this.client.rebalance())
+            this.lastRebalanceCall = currentTimestamp;
     }
 }
