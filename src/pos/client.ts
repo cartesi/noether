@@ -300,8 +300,10 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
 
             // increment rebalance counter
             monitoring.rebalance.inc();
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

@@ -14,6 +14,7 @@ import { parseEther } from "@ethersproject/units";
 export const TIMEOUT = parseInt(<string>process.env.TIMEOUT);
 export const RETRY_INTERVAL = parseInt(<string>process.env.RETRY_INTERVAL);
 export const POLLING_INTERVAL = parseInt(<string>process.env.POLLING_INTERVAL);
+export const REBALANCE_INTERVAL = parseInt(<string>process.env.REBALANCE_INTERVAL);
 export const CONFIRMATIONS = parseInt(<string>process.env.CONFIRMATIONS);
 export const CONFIRMATION_TIMEOUT = parseInt(
     <string>process.env.CONFIRMATION_TIMEOUT
