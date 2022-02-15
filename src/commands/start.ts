@@ -36,7 +36,7 @@ export const builder = (yargs: Argv) => {
     return yargs
         .option("url", {
             describe: "URL of the Ethereum node",
-            default: process.env.URL || "http://localhost:8545",
+            default: process.env.URL,
         })
         .option("wallet", {
             describe: "Filename of JSON wallet file",
@@ -48,7 +48,7 @@ export const builder = (yargs: Argv) => {
         })
         .option("gasPrice", {
             describe: "Gas price predictor strategy",
-            default: process.env.GAS_PRICE_PROVIDER || "eth-provider",
+            default: process.env.GAS_PRICE_PROVIDER,
             demandOption: true,
             choices: gasPriceProviderTypes,
         })

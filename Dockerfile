@@ -36,6 +36,8 @@ COPY package.json ./
 COPY yarn.lock ./
 RUN yarn install --frozen-lockfile
 
-## We just need the build to execute the command
+# We just need the build to execute the command
 COPY --from=builder /usr/src/app/dist ./dist
+# And the default environment variables
+COPY .env ./
 ENTRYPOINT ["node", "/app/dist/index.js"]

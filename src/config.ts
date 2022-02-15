@@ -11,15 +11,26 @@
 
 import { parseEther } from "@ethersproject/units";
 
-export const TIMEOUT = 24 * 60 * 60 * 1000;
-export const RETRY_INTERVAL = 10000;
-export const POLLING_INTERVAL = 30000;
-export const CONFIRMATIONS = 1;
-export const CONFIRMATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes
-export const GAS_LIMIT_MULTIPLIER = 160;
-export const GAS_PRICE_MULTIPLIER = 160;
-export const BALANCE_THRESHOLD = parseEther("0.05");
-export const GAS_STATION_API_CHAIN_ID = 1;
-export const GAS_STATION_API_URL =
-    "https://ethgasstation.info/json/ethgasAPI.json";
-export const GAS_STATION_API_REQUEST_TIMEOUT_MS = 10000;
+export const TIMEOUT = parseInt(<string>process.env.TIMEOUT);
+export const RETRY_INTERVAL = parseInt(<string>process.env.RETRY_INTERVAL);
+export const POLLING_INTERVAL = parseInt(<string>process.env.POLLING_INTERVAL);
+export const CONFIRMATIONS = parseInt(<string>process.env.CONFIRMATIONS);
+export const CONFIRMATION_TIMEOUT = parseInt(
+    <string>process.env.CONFIRMATION_TIMEOUT
+);
+export const GAS_LIMIT_MULTIPLIER = parseInt(
+    <string>process.env.GAS_LIMIT_MULTIPLIER
+);
+export const GAS_PRICE_MULTIPLIER = parseInt(
+    <string>process.env.GAS_PRICE_MULTIPLIER
+);
+export const BALANCE_THRESHOLD = parseEther(
+    <string>process.env.BALANCE_THRESHOLD
+);
+export const GAS_STATION_API_CHAIN_ID = parseInt(
+    <string>process.env.GAS_STATION_API_CHAIN_ID
+);
+export const GAS_STATION_API_URL = process.env.GAS_STATION_API_URL;
+export const GAS_STATION_API_REQUEST_TIMEOUT_MS = parseInt(
+    <string>process.env.GAS_STATION_API_REQUEST_TIMEOUT_MS
+);
