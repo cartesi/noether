@@ -48,7 +48,8 @@ export const app = async (
     hostname: string,
     port: number,
     gasPriceProviderType: GasPriceProviderType,
-    gasStationAPIKey: string | undefined
+    gasStationAPIKey: string | undefined,
+    rebalanceInterval: number
 ) => {
     // connect to node
     const { address, network, pos, provider, workerManager } = await connect(
@@ -101,7 +102,7 @@ export const app = async (
 
     // create protocol client (smart contract communication)
     const client: ProtocolClient = pool
-        ? new PoolProtocolImpl(pos, user, workerManager, gasPriceProvider)
+        ? new PoolProtocolImpl(pos, user, workerManager, gasPriceProvider, rebalanceInterval)
         : new ProtocolImpl(pos, workerManager, gasPriceProvider);
 
     // create block producer

@@ -26,6 +26,7 @@ interface Args {
     port: number;
     gasPrice: GasPriceProviderType;
     gasStationAPIKey: string;
+    rebalanceInterval: number;
     verbose: boolean;
 }
 
@@ -55,6 +56,10 @@ export const builder = (yargs: Argv) => {
         .option("gasStationAPIKey", {
             describe: "Gas Station API Key",
             default: process.env.GAS_STATION_API_KEY,
+        })
+        .option("rebalanceInterval", {
+            describe: "Rebalance interval in minutes",
+            default: process.env.REBALANCE_INTERVAL || 0,
         })
         .option("create", {
             describe: "Create a wallet if it doesn't exist",
@@ -96,6 +101,7 @@ export const handler = (args: Args) => {
         args.hostname,
         args.port,
         args.gasPrice,
-        args.gasStationAPIKey
+        args.gasStationAPIKey,
+        args.rebalanceInterval
     );
 };

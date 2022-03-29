@@ -64,6 +64,7 @@ Noether command line provides the following options:
 | --accountIndex     |                      | 0                     | Account index from server to use |
 | --gasPrice         | GAS_PRICE_PROVIDER   | eth-provider          | Gas price predictor strategy     |
 | --gasStationAPIKey | GAS_STATION_API_KEY  |                       |                                  |
+| --rebalanceInterval| REBALANCE_INTERVAL   | 0                     | Min rebalance interval in mins   |
 
 ### Gas price
 
