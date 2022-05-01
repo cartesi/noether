@@ -17,13 +17,14 @@ import * as monitoring from "./monitoring";
 import { sleep } from "./util";
 import { connect } from "./connection";
 import { BlockProducer } from "./block";
-import { hire, retire, isPool } from "./worker";
-import { POLLING_INTERVAL, BALANCE_THRESHOLD } from "./config";
+import { hire, isPool, retire } from "./worker";
+import { BALANCE_THRESHOLD, POLLING_INTERVAL } from "./config";
 import { PoolProtocolImpl, ProtocolClient, ProtocolImpl } from "./pos";
 import {
     createGasPriceProvider,
     GasPriceProviderType,
 } from "./gas-price/gas-price-provider";
+import TransactionManager from "./transactionManager";
 
 const checkBalance = async (provider: Provider, address: string) => {
     // query node wallet ETH balance
@@ -65,6 +66,8 @@ export const app = async (
         gasStationAPIKey
     );
 
+    const transactionManager = new TransactionManager(gasPriceProvider);
+
     // set labels of metrics
     monitoring.register.setDefaultLabels({
         network: network.name,
@@ -77,7 +80,7 @@ export const app = async (
     }
 
     // worker hiring
-    const user = await hire(workerManager, gasPriceProvider, address);
+    const user = await hire(workerManager, transactionManager, address);
 
     // set labels of metrics
     monitoring.register.setDefaultLabels({
@@ -101,8 +104,8 @@ export const app = async (
 
     // create protocol client (smart contract communication)
     const client: ProtocolClient = pool
-        ? new PoolProtocolImpl(pos, user, workerManager, gasPriceProvider)
-        : new ProtocolImpl(pos, workerManager, gasPriceProvider);
+        ? new PoolProtocolImpl(pos, user, workerManager, transactionManager)
+        : new ProtocolImpl(pos, workerManager, transactionManager);
 
     // create block producer
     const blockProducer = new BlockProducer(pos.address, client);
@@ -111,7 +114,7 @@ export const app = async (
     while (true) {
         try {
             // check if node retired
-            if (await retire(workerManager, gasPriceProvider, address, user)) {
+            if (await retire(workerManager, address, user)) {
                 break;
             }
 
