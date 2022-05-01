@@ -23,3 +23,4 @@ export const GAS_STATION_API_CHAIN_ID = 1;
 export const GAS_STATION_API_URL =
     "https://ethgasstation.info/json/ethgasAPI.json";
 export const GAS_STATION_API_REQUEST_TIMEOUT_MS = 10000;
+export const MAX_GAS_PRICE_GWEI = 1000;

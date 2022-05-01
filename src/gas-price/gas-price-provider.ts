@@ -15,6 +15,7 @@ import {
     GAS_STATION_API_CHAIN_ID,
     GAS_STATION_API_REQUEST_TIMEOUT_MS,
     GAS_STATION_API_URL,
+    MAX_GAS_PRICE_GWEI,
 } from "../config";
 import GasStationGasPriceProvider from "./providers/gas-station-gas-price-provider";
 import ProviderGasPriceProvider from "./providers/provider-gas-price-provider";
@@ -24,6 +25,7 @@ import Eip1559GasPriceProvider, {
     Eip1559Profile,
 } from "./providers/eip1559-gas-price-provider";
 import { BigNumber } from "ethers";
+import SpikeProtectionGasPriceProvider from "./providers/spike-protection-gas-price-provider";
 
 export const gasPriceProviderTypes = [
     "eth-provider",
@@ -62,6 +64,7 @@ export const createGasPriceProvider = async (
         provider,
         GAS_PRICE_MULTIPLIER
     );
+    let proxiedGasPriceProvider: GasPriceProvider = providerGasPriceProvider;
 
     switch (type) {
         case "fastest":
@@ -83,10 +86,11 @@ export const createGasPriceProvider = async (
                 timeout: GAS_STATION_API_REQUEST_TIMEOUT_MS,
                 profile: type,
             });
-            return new ChainGasPriceProvider([
+            proxiedGasPriceProvider = new ChainGasPriceProvider([
                 gasStationProvider,
                 providerGasPriceProvider,
             ]);
+            break;
         case "eip-1559-urgent":
         case "eip-1559-fast":
         case "eip-1559-normal":
@@ -110,9 +114,17 @@ export const createGasPriceProvider = async (
                     profile = "normal";
                     break;
             }
-            return new Eip1559GasPriceProvider(provider, profile);
+            proxiedGasPriceProvider = new Eip1559GasPriceProvider(
+                provider,
+                profile
+            );
+            break;
+        default:
+            log.debug(`using gas price predictor from ethereum provider`);
     }
 
-    log.debug(`using gas price predictor from ethereum provider`);
-    return providerGasPriceProvider;
+    return new SpikeProtectionGasPriceProvider(
+        proxiedGasPriceProvider,
+        MAX_GAS_PRICE_GWEI
+    );
 };

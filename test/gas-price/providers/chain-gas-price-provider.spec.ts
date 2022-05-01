@@ -64,7 +64,7 @@ describe("chain gas price provider test suite", () => {
     it("should not provide gas price with no providers", async () => {
         sandbox.stub(log, "error").returns();
         const gasPriceProvider = new ChainGasPriceProvider([]);
-        expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
+        await expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
             "no valid gas price returned from the chain of gas price providers"
         );
     });
@@ -77,7 +77,7 @@ describe("chain gas price provider test suite", () => {
             gasPriceProvider1,
             gasPriceProvider2,
         ]);
-        expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
+        await expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
             "no valid gas price returned from the chain of gas price providers"
         );
     });
