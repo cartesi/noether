@@ -35,7 +35,7 @@ describe("gas station gas price provider test suite", () => {
             profile,
             key: "test",
         });
-        const gasPrice = await gasPriceProvider.getGasPrice();
+        const { gasPrice } = await gasPriceProvider.getGasPrice();
         expect(axiosGetSpy.callCount).to.be.eq(1);
         expect(gasPrice.toString()).to.be.eq("45000000000");
     });
@@ -44,7 +44,7 @@ describe("gas station gas price provider test suite", () => {
         sandbox.stub(log, "error").returns();
         sandbox.stub(axios, "get").returns(Promise.reject("test error"));
         const provider = new GasStationGasPriceProvider();
-        expect(provider.getGasPrice).to.throw;
+        await expect(provider.getGasPrice()).to.be.rejected;
     });
 
     it("should reject on missing price", async () => {
@@ -52,7 +52,7 @@ describe("gas station gas price provider test suite", () => {
         sandbox.stub(log, "error").returns();
         sandbox.stub(axios, "get").returns(Promise.resolve({ data: {} }));
         const gasPriceProvider = new GasStationGasPriceProvider({ profile });
-        expect(gasPriceProvider.getGasPrice()).to.eventually.throw(
+        await expect(gasPriceProvider.getGasPrice()).to.be.rejectedWith(
             `gas station did not return a ${profile} price`
         );
     });

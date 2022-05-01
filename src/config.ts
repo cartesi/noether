@@ -35,3 +35,6 @@ export const GAS_STATION_API_URL = process.env.GAS_STATION_API_URL;
 export const GAS_STATION_API_REQUEST_TIMEOUT_MS = parseInt(
     <string>process.env.GAS_STATION_API_REQUEST_TIMEOUT_MS
 );
+export const MAX_GAS_PRICE_GWEI = parseInt(
+    <string>process.env.MAX_GAS_PRICE_GWEI
+);
