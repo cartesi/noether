@@ -57,13 +57,13 @@ For that matter, you can use the [Cartesi Explorer](https://explorer.cartesi.io)
 
 Noether command line provides the following options:
 
-| Option             | Environment variable | Default               | Description                      |
-| ------------------ | -------------------- | --------------------- | -------------------------------- |
-| --url              | URL                  | http://localhost:8545 | URL of the Ethereum node         |
-| --wallet           |                      |                       | Filename of JSON wallet file     |
-| --accountIndex     |                      | 0                     | Account index from server to use |
-| --gasPrice         | GAS_PRICE_PROVIDER   | eth-provider          | Gas price predictor strategy     |
-| --gasStationAPIKey | GAS_STATION_API_KEY  |                       |                                  |
+| Option             | Environment variable  | Default               | Description                                                                                                                                                                                                |
+|--------------------|-----------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --url              | `URL`                 | http://localhost:8545 | URL of the Ethereum node                                                                                                                                                                                   |
+| --wallet           |                       |                       | Filename of JSON wallet file                                                                                                                                                                               |
+| --accountIndex     |                       | 0                     | Account index from server to use                                                                                                                                                                           |
+| --gasPrice         | `GAS_PRICE_PROVIDER`  | `eth-provider`        | Gas price predictor strategy. Possible values are:<br/>- `eth-provider`<br/>- `fastest`<br/>- `fast`<br/>- `average`<br/>- `safeLow`<br/>- `eip-1559-urgent`<br/>- `eip-1559-fast`<br/>- `eip-1559-normal` |
+| --gasStationAPIKey | `GAS_STATION_API_KEY` |                       | API key if you use the ETH Gas Station's prediction strategy.                                                                                                                                              |
 
 ### Gas price
 
@@ -71,21 +71,27 @@ Every transaction sent by the node needs to predict the gas price.
 The higher the gas price, the faster the transaction will be mined by the ethereum blockchain.
 But it will cost more.
 
-By default the node uses the gas price provided by the ethereum provider used by the node (`eth-provider`), by making a call to [eth_gasPrice](https://eth.wiki/json-rpc/API#eth_gasprice). This may not be the best gas price prediction, so we provide another option, which is to call the [ETH Gas Station API](https://docs.ethgasstation.info).
+By default, the node retrieves the current gas price
+by making a call to its ethereum provider backend:
+[eth_gasPrice](https://eth.wiki/json-rpc/API#eth_gasprice).
+It then multiplies this number by x1.6 and uses the result as the gas price for transactions.
+This is the `eth-provider` strategy.
 
-The API is provided for free (up to a limit), but requires signup to request an API key. Refer to [their documentation](https://docs.ethgasstation.info) on how to signup. Once you get an API key you can restart your node with the following options:
+This may not be the best gas price prediction, so we provide other options.
+The node comes with 3 different gas price prediction systems.
 
+| Strategy            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ETH Provider        | Retrieves gas price from the ethereum provider used by the node, by making calls to [eth_gasPrice](https://eth.wiki/json-rpc/API#eth_gasprice).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ETH Gas Station API | Gets data from [ETH Gas Station API](https://docs.ethgasstation.info). Possible options are:<br/>- `fastest`: expected to be mined in < 30 seconds<br/>- `fast`: expected to be mined in < 2 minutes<br/>- `average`: expected to be mined in < 5 minutes<br/>- `safeLow`: expected to be mined in < 30 minutes<br/>The API is provided for free (up to a limit), but requires signup to request an API key. Refer to [their documentation](https://docs.ethgasstation.info) on how to signup.                                                                                                                                                       |
+| EIP-1559            | It uses the [eip1559-fee-suggestions-ethers](https://www.npmjs.com/package/eip1559-fee-suggestions-ethers) library to extrapolate the best possible EIP-1559 priority fee. Under the hood it gets data from the ethereum provider used by the node, by making calls to [eth_feeHistory](https://playground.open-rpc.org/?schemaUrl=https://raw.githubusercontent.com/ethereum/eth1.0-apis/assembled-spec/openrpc.json&uiSchema%5BappBar%5D%5Bui:splitView%5D=false&uiSchema%5BappBar%5D%5Bui:input%5D=false&uiSchema%5BappBar%5D%5Bui:examplesDropdown%5D=false). Options are:<br/>- `eip-1559-urgent`<br/>- `eip-1559-fast`<br/>- `eip-1559-normal` |
+
+For instance, if you want to use the ETH Gas Station API strategy, use the following options:
+```bash
+--gasPrice <fastest | fast | average | safeLow> --gasStationAPIKey <apiKey>
 ```
---gasPrice <fast | fastest | safeLow | average> --gasStationAPIKey <apiKey>
 
-where:
-fastest: expected to be mined in < 30 seconds
-fast: expected to be mined in < 2 minutes
-average: expected to be mined in < 5 minutes
-safeLow: expected to be mined in < 30 minutes
-```
-
-If you are using environment variables you can use the variables `GAS_PRICE_PROVIDER` and `GAS_STATION_API_KEY` for the same effect.
+If you are using environment variables you can use `GAS_PRICE_PROVIDER` for the same effect, as well as `GAS_STATION_API_KEY` if you are using the ETH Gas Station API.
 
 ### Monitoring
 

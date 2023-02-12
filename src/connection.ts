@@ -9,8 +9,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-import { ethers, Wallet } from "ethers";
-import { HDNode } from "@ethersproject/hdnode";
+import { StaticJsonRpcProvider } from "@ethersproject/providers";
 import log from "loglevel";
 import { createPoS, createWorkerManager } from "./contracts";
 import * as wallet from "./wallet";
@@ -22,7 +21,7 @@ export const connect = async (
     create: boolean
 ) => {
     log.info(`connecting to ${url}...`);
-    const provider = new ethers.providers.StaticJsonRpcProvider(url);
+    const provider = new StaticJsonRpcProvider(url);
 
     // get network information
     const network = await provider.getNetwork();

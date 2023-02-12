@@ -15,20 +15,19 @@ import pTimeout from "p-timeout";
 
 import * as monitoring from "../monitoring";
 import { formatCTSI } from "../util";
-import { CONFIRMATIONS, CONFIRMATION_TIMEOUT } from "../config";
+import { CONFIRMATION_TIMEOUT, CONFIRMATIONS } from "../config";
 import { BlockSelector, PoS, RewardManager, Staking } from "@cartesi/pos";
 import { StakingPoolImpl } from "@cartesi/staking-pool";
 import { WorkerAuthManager } from "@cartesi/util";
-import { BigNumber, Overrides, ContractTransaction } from "ethers";
-import { ChainClient, AbstractProtocolClient } from ".";
-import { GAS_LIMIT_MULTIPLIER } from "../config";
+import { BigNumber, ContractTransaction } from "ethers";
+import { AbstractProtocolClient, ChainClient } from ".";
 import {
     createBlockSelector,
     createRewardManager,
     createStaking,
     createStakingPool,
 } from "../contracts";
-import { GasPriceProvider } from "../gas-price/gas-price-provider";
+import TransactionManager from "../transactionManager";
 
 class ChainImpl implements ChainClient {
     protected pos: PoS;
@@ -41,11 +40,15 @@ class ChainImpl implements ChainClient {
 
     private blockSelector: BlockSelector | undefined;
 
-    protected gasPriceProvider: GasPriceProvider;
+    protected transactionManager: TransactionManager;
 
-    constructor(pos: PoS, gasPriceProvider: GasPriceProvider, chainId: number) {
+    constructor(
+        pos: PoS,
+        transactionManager: TransactionManager,
+        chainId: number
+    ) {
         this.pos = pos;
-        this.gasPriceProvider = gasPriceProvider;
+        this.transactionManager = transactionManager;
         this.chainId = chainId;
         this.rewardManager = undefined;
         this.staking = undefined;
@@ -137,15 +140,12 @@ class ChainImpl implements ChainClient {
 
     async produceBlock(): Promise<ContractTransaction> {
         const nonce = this.pos.signer.getTransactionCount("latest");
-        const gasPrice = await this.gasPriceProvider.getGasPrice();
         const gasLimit = await this.pos.estimateGas.produceBlock(this.chainId);
-        const overrides: Overrides = {
+        const overrides = await this.transactionManager.getOverrides(gasLimit);
+        return this.pos.produceBlock(this.chainId, {
+            ...overrides,
             nonce,
-            gasPrice,
-            gasLimit: gasLimit.mul(GAS_LIMIT_MULTIPLIER).div(100),
-        };
-
-        return this.pos.produceBlock(this.chainId, overrides);
+        });
     }
 }
 
@@ -156,11 +156,11 @@ class PoolChainImpl extends ChainImpl {
 
     constructor(
         pos: PoS,
-        gasPriceProvider: GasPriceProvider,
+        transactionManager: TransactionManager,
         chainId: number,
         pool: string
     ) {
-        super(pos, gasPriceProvider, chainId);
+        super(pos, transactionManager, chainId);
         this.address = pool;
     }
 
@@ -176,31 +176,28 @@ class PoolChainImpl extends ChainImpl {
 
     async produceBlock(): Promise<ContractTransaction> {
         const nonce = this.pos.signer.getTransactionCount("latest");
-        const gasPrice = await this.gasPriceProvider.getGasPrice();
         const pool = await this.getStakingPool();
         const gasLimit = await pool.estimateGas.produceBlock(this.chainId);
-        const overrides: Overrides = {
+        const overrides = await this.transactionManager.getOverrides(gasLimit);
+        return pool.produceBlock(this.chainId, {
+            ...overrides,
             nonce,
-            gasPrice,
-            gasLimit: gasLimit.mul(GAS_LIMIT_MULTIPLIER).div(100),
-        };
-
-        return pool.produceBlock(this.chainId, overrides);
+        });
     }
 }
 
 export class ProtocolImpl extends AbstractProtocolClient {
-    private gasPriceProvider: GasPriceProvider;
+    private transactionManager: TransactionManager;
 
     private chains: ChainClient[];
 
     constructor(
         pos: PoS,
         authManager: WorkerAuthManager,
-        gasPriceProvider: GasPriceProvider
+        transactionManager: TransactionManager
     ) {
         super(pos, authManager);
-        this.gasPriceProvider = gasPriceProvider;
+        this.transactionManager = transactionManager;
         this.chains = [];
     }
 
@@ -214,7 +211,7 @@ export class ProtocolImpl extends AbstractProtocolClient {
         while (index >= this.chains.length) {
             const chain = new ChainImpl(
                 this.pos,
-                this.gasPriceProvider,
+                this.transactionManager,
                 this.chains.length
             );
             this.chains.push(chain);
@@ -226,7 +223,7 @@ export class ProtocolImpl extends AbstractProtocolClient {
 export class PoolProtocolImpl extends AbstractProtocolClient {
     private pool: string;
 
-    private gasPriceProvider: GasPriceProvider;
+    private transactionManager: TransactionManager;
 
     private chains: ChainClient[];
 
@@ -236,12 +233,12 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
         pos: PoS,
         pool: string,
         authManager: WorkerAuthManager,
-        gasPriceProvider: GasPriceProvider
+        transactionManager: TransactionManager
     ) {
         super(pos, authManager);
         this.pos = pos;
         this.pool = pool;
-        this.gasPriceProvider = gasPriceProvider;
+        this.transactionManager = transactionManager;
         this.chains = [];
     }
 
@@ -249,7 +246,7 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
         while (index >= this.chains.length) {
             const chain = new PoolChainImpl(
                 this.pos,
-                this.gasPriceProvider,
+                this.transactionManager,
                 this.chains.length,
                 this.pool
             );
@@ -300,8 +297,10 @@ export class PoolProtocolImpl extends AbstractProtocolClient {
 
             // increment rebalance counter
             monitoring.rebalance.inc();
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

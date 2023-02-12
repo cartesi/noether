@@ -10,6 +10,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+import "./env";
 import log from "loglevel";
 import chalk from "chalk";
 import prefix from "loglevel-plugin-prefix";
