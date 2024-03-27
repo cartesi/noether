@@ -19,7 +19,7 @@ import { ProtocolClient } from "./pos";
 import * as monitoring from "./monitoring";
 import { constants } from "ethers";
 
-const explorerUrl = "https://explorer.cartesi.io/staking";
+const explorerUrl = "https://explorer.cartesi.io/node-runners";
 
 export class BlockProducer {
     private address: string;
