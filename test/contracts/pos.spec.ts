@@ -16,6 +16,7 @@ import { createPoS } from "../../src/contracts";
 
 import mainnet from "@cartesi/pos/export/abi/mainnet.json";
 import goerli from "@cartesi/pos/export/abi/goerli.json";
+import sepolia from "@cartesi/pos/export/abi/sepolia.json";
 
 describe("pos contracts test suite", () => {
     it("should create PoS mainnet contract", async () => {
@@ -28,6 +29,19 @@ describe("pos contracts test suite", () => {
         );
         const pos = await createPoS(network, signer);
         expect(pos.address).to.equal(mainnet.contracts.PoS.address);
+        expect(pos.signer).to.equal(signer);
+    });
+
+    it("should create PoS sepolia contract", async () => {
+        const network: Network = {
+            chainId: 11155111,
+            name: "sepolia",
+        };
+        const signer: Signer = new VoidSigner(
+            "0x569369A96be963B7ef2bA01dA792EF95fDcCD5b0"
+        );
+        const pos = await createPoS(network, signer);
+        expect(pos.address).to.equal(sepolia.contracts.PoS.address);
         expect(pos.signer).to.equal(signer);
     });
 

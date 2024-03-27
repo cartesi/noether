@@ -16,6 +16,7 @@ import { createWorkerManager } from "../../src/contracts/util";
 
 import mainnet from "@cartesi/util/export/abi/mainnet.json";
 import goerli from "@cartesi/util/export/abi/goerli.json";
+import sepolia from "@cartesi/util/export/abi/sepolia.json";
 
 describe("util contracts test suite", () => {
     it("should create mainnet contract", async () => {
@@ -44,6 +45,21 @@ describe("util contracts test suite", () => {
         const workerManager = await createWorkerManager(network, signer);
         expect(workerManager.address).to.equal(
             goerli.contracts.WorkerManagerAuthManagerImpl.address
+        );
+        expect(workerManager.signer).to.equal(signer);
+    });
+
+    it("should create sepolia contract", async () => {
+        const network: Network = {
+            chainId: 11155111,
+            name: "sepolia",
+        };
+        const signer: Signer = new VoidSigner(
+            "0x569369A96be963B7ef2bA01dA792EF95fDcCD5b0"
+        );
+        const workerManager = await createWorkerManager(network, signer);
+        expect(workerManager.address).to.equal(
+            sepolia.contracts.WorkerManagerAuthManagerImpl.address
         );
         expect(workerManager.signer).to.equal(signer);
     });
