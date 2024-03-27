@@ -118,12 +118,12 @@ Note that the default binding hostname is `127.0.0.1`, which means it's only acc
 
 ## Public test network
 
-Running on [Goerli](https://goerli.net) or [Ropsten](https://github.com/ethereum/ropsten) is very similar to running on `mainnet`, with the following differences:
+Running on [Goerli](https://goerli.net) or [Sepolia](https://sepolia.dev/) is very similar to running on `mainnet`, with the following differences:
 
 1. The command is:
 
 ```
-docker run -it --rm --name cartesi_testnet_noether -v cartesi_testnet_wallet:/root/.ethereum cartesi/noether --url https://[goerli|ropsten].infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
+docker run -it --rm --name cartesi_testnet_noether -v cartesi_testnet_wallet:/root/.ethereum cartesi/noether --url https://[goerli|sepolia].infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
 ```
 
 2. Cloudflare Ethereum Gateway does not provide an option for testnets, so we use [Infura](https://infura.io). You need to setup an Infura account, create an application and use the application URL in the command above.
