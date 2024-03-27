@@ -51,7 +51,7 @@ Once that is done, you now need to hire your new node, so as to make it work on 
 For that matter, you can use the [Cartesi Explorer](https://explorer.cartesi.io) and perform the following tasks:
 
 -   Go to https://explorer.cartesi.io and connect to your personal wallet using [MetaMask](https://metamask.io).
--   [Click on "Staking"](https://explorer.cartesi.io/staking), and then on `"Click to hire node"`. Fill in the form with your node address (which in this example is `0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9`), set the amount of ETH you want to send to your node wallet, and click `"Hire Node"`. This will send a transaction and make your node "wake up" and start working on your behalf. The amount of ETH you decide to send depends on how long you expect to keep your node running. Each block you produce can be estimated to spend around `156454` gas units, so it is possible to [calculate](https://ethgasstation.info/calculatorTxV.php) how much ETH you will spend based on the network gas price. You should keep an eye on your node funds, and restock it whenever you deem necessary.
+-   [Click on "Node Runners"](https://explorer.cartesi.io/node-runners), and choose between create a private-node or a public pool, follow the steps. Eventually, Fill in the form with your node address (which in this example is `0x8B40e13Fb33dE564C3e17E8428F8464AF49DB6d9`), set the amount of ETH you want to send to your node wallet, and `"hire the node"`. This will send a transaction and make your node "wake up" and start working on your behalf. The amount of ETH you decide to send depends on how long you expect to keep your node running. Each block you produce can be estimated to spend around `156454` gas units, so it is possible to [calculate](https://ethgasstation.info/calculatorTxV.php) how much ETH you will spend based on the network gas price. You should keep an eye on your node funds, and restock it whenever you deem necessary.
 
 ### Additional options
 
@@ -118,12 +118,12 @@ Note that the default binding hostname is `127.0.0.1`, which means it's only acc
 
 ## Public test network
 
-Running on [Goerli](https://goerli.net) or [Ropsten](https://github.com/ethereum/ropsten) is very similar to running on `mainnet`, with the following differences:
+Running on [Goerli](https://goerli.net) or [Sepolia](https://sepolia.dev/) is very similar to running on `mainnet`, with the following differences:
 
 1. The command is:
 
 ```
-docker run -it --rm --name cartesi_testnet_noether -v cartesi_testnet_wallet:/root/.ethereum cartesi/noether --url https://[goerli|ropsten].infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
+docker run -it --rm --name cartesi_testnet_noether -v cartesi_testnet_wallet:/root/.ethereum cartesi/noether --url https://[goerli|sepolia].infura.io/v3/<project_id> --wallet /root/.ethereum/key --create --verbose
 ```
 
 2. Cloudflare Ethereum Gateway does not provide an option for testnets, so we use [Infura](https://infura.io). You need to setup an Infura account, create an application and use the application URL in the command above.

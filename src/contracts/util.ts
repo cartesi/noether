@@ -19,12 +19,12 @@ import { ChainMap, getAddress } from ".";
 
 import mainnet from "@cartesi/util/export/abi/mainnet.json";
 import goerli from "@cartesi/util/export/abi/goerli.json";
-import ropsten from "@cartesi/util/export/abi/ropsten.json";
+import sepolia from "@cartesi/util/export/abi/sepolia.json";
 import localhost from "./localhost.json";
 
 const abis: ChainMap = {
     1: mainnet,
-    3: ropsten,
+    11155111: sepolia,
     5: goerli,
     31337: localhost,
 };

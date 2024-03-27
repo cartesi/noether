@@ -17,11 +17,11 @@ import {
 import { ChainMap } from ".";
 
 import goerli from "@cartesi/staking-pool/export/abi/goerli.json";
-import ropsten from "@cartesi/staking-pool/export/abi/ropsten.json";
+import sepolia from "@cartesi/staking-pool/export/abi/sepolia.json";
 import localhost from "./localhost.json";
 
 const abis: ChainMap = {
-    3: ropsten,
+    11155111: sepolia,
     5: goerli,
     31337: localhost,
 };
